@@ -36,41 +36,63 @@ export function FinalistPicker({
     setMessage("Finalists updated. Only these dogs appear on the vote page.");
   }
 
+  const byRound = new Map<number, typeof dogs>();
+  for (const dog of dogs) {
+    const list = byRound.get(dog.roundNumber) ?? [];
+    list.push(dog);
+    byRound.set(dog.roundNumber, list);
+  }
+  const rounds = [...byRound.keys()].sort((a, b) => a - b);
+
   return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {dogs.map((dog) => (
-          <Card
-            key={dog.id}
-            className="cursor-pointer overflow-hidden"
-            onClick={() => toggle(dog.id)}
-          >
-            <div className="flex items-center gap-3 p-3">
-              <Checkbox
-                checked={selected.has(dog.id)}
-                onCheckedChange={() => toggle(dog.id)}
-              />
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md">
-                <DogPhoto
-                  src={dog.photoUrl}
-                  alt={dog.dogName}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-orange-800">
-                  {dog.uniqueId}
-                </p>
-                <p className="font-medium">{dog.dogName}</p>
-                <p className="text-xs text-slate-500">
-                  Round {dog.roundNumber} · {dog.roundVoteCount ?? 0} round vote
-                  {(dog.roundVoteCount ?? 0) === 1 ? "" : "s"}
-                </p>
-              </div>
+    <div className="space-y-8">
+      {rounds.map((roundNumber) => {
+        const roundDogs = [...(byRound.get(roundNumber) ?? [])].sort(
+          (a, b) => (b.roundVoteCount ?? 0) - (a.roundVoteCount ?? 0),
+        );
+        return (
+          <section key={roundNumber} className="space-y-3">
+            <h2 className="text-xl font-semibold">
+              Round {roundNumber} votes
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {roundDogs.map((dog) => (
+                <Card
+                  key={dog.id}
+                  className="cursor-pointer overflow-hidden"
+                  onClick={() => toggle(dog.id)}
+                >
+                  <div className="flex items-center gap-3 p-3">
+                    <Checkbox
+                      checked={selected.has(dog.id)}
+                      onCheckedChange={() => toggle(dog.id)}
+                    />
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md">
+                      <DogPhoto
+                        src={dog.photoUrl}
+                        alt={dog.dogName}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-orange-800">
+                        {dog.uniqueId}
+                      </p>
+                      <p className="font-medium">{dog.dogName}</p>
+                    </div>
+                    <p className="shrink-0 text-right">
+                      <span className="block text-2xl font-bold leading-none">
+                        {dog.roundVoteCount ?? 0}
+                      </span>
+                      <span className="text-xs text-slate-500">votes</span>
+                    </p>
+                  </div>
+                </Card>
+              ))}
             </div>
-          </Card>
-        ))}
-      </div>
+          </section>
+        );
+      })}
       <Button onClick={save} disabled={saving}>
         {saving ? "Saving..." : "Save finalists"}
       </Button>

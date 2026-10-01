@@ -33,8 +33,8 @@ export default async function AdminFinalistsPage() {
       <div>
         <h1 className="text-3xl font-bold">Finalist management</h1>
         <p className="text-slate-600">
-          Sorted by introduction (round) votes. Check the dogs that should
-          appear on the prize Vote page.
+          Round 1 (and every round) lists each dog with its introduction vote
+          count. Check who should go to prize voting, then save.
         </p>
       </div>
       <FinalistPicker dogs={dogs} />
