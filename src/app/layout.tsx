@@ -13,6 +13,13 @@ export const metadata: Metadata = {
   title: "Dog Costume Contest",
   description:
     "Register your dog, browse contestants, and vote in the Fur-right Night awards.",
+  icons: {
+    icon: [
+      { url: "/icon", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-icon", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

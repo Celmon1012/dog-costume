@@ -83,8 +83,9 @@ export default async function AdminDashboardPage() {
               round vote counts, then <strong>Start prize voting</strong>.
             </li>
             <li>
-              Guests use <strong>/vote</strong> for the five prizes (finalists
-              only). Only admins see <strong>Results</strong>.
+              Guests use <strong>/vote</strong> for the five prizes. On{" "}
+              <strong>Results</strong>, rank by votes and choose each winner.
+              After all five are set, guests see <strong>/winners</strong>.
             </li>
           </ol>
         </CardContent>

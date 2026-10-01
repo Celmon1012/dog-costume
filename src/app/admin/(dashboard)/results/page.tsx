@@ -1,5 +1,4 @@
-import { Badge } from "@/components/ui/badge";
-import { DogPhoto } from "@/components/dogs/dog-photo";
+import { WinnerPicker } from "@/components/admin/winner-picker";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -11,33 +10,38 @@ export default async function AdminResultsPage() {
     await Promise.all([
       supabase
         .from("prize_categories")
-        .select("id, name, subcategory, sort_order")
+        .select("id, name, subcategory, sort_order, winner_dog_id")
         .order("sort_order", { ascending: true }),
       supabase.from("votes").select("dog_id, prize_category_id"),
       supabase
         .from("dogs")
-        .select("id, unique_id, dog_name, photo_url, costume_description")
+        .select("id, unique_id, dog_name, photo_url, costume_description, is_finalist")
+        .eq("is_finalist", true)
         .order("unique_id", { ascending: true }),
     ]);
 
   const results = (categories ?? []).map((category) => {
-    const tallies = (dogs ?? []).map((dog) => {
-      const voteCount = (votes ?? []).filter(
-        (vote) =>
-          vote.prize_category_id === category.id && vote.dog_id === dog.id,
-      ).length;
-      return {
-        uniqueId: dog.unique_id,
-        dogName: dog.dog_name,
-        photoUrl: dog.photo_url,
-        costumeDescription: dog.costume_description,
-        votes: voteCount,
-      };
-    }).sort((a, b) => b.votes - a.votes);
-    const winner = tallies.find((row) => row.votes > 0) ?? null;
+    const tallies = (dogs ?? [])
+      .map((dog) => {
+        const voteCount = (votes ?? []).filter(
+          (vote) =>
+            vote.prize_category_id === category.id && vote.dog_id === dog.id,
+        ).length;
+        return {
+          id: dog.id as string,
+          uniqueId: dog.unique_id as string,
+          dogName: dog.dog_name as string,
+          photoUrl: (dog.photo_url as string) ?? "",
+          costumeDescription: dog.costume_description as string,
+          votes: voteCount,
+        };
+      })
+      .sort((a, b) => b.votes - a.votes || a.uniqueId.localeCompare(b.uniqueId));
     return {
-      category,
-      winner,
+      id: category.id as string,
+      name: category.name as string,
+      subcategory: category.subcategory as string,
+      winnerDogId: (category.winner_dog_id as string | null) ?? null,
       tallies,
       totalVotes: tallies.reduce((sum, row) => sum + row.votes, 0),
     };
@@ -48,56 +52,11 @@ export default async function AdminResultsPage() {
       <div>
         <h1 className="text-3xl font-bold">Results</h1>
         <p className="text-slate-600">
-          Admin-only tallies. Winners are the dogs with the most votes in each
-          prize category.
+          Finalists ranked by prize votes. Choose the winner of each category —
+          the guest congratulations page goes live after all five are set.
         </p>
       </div>
-      {results.map(({ category, winner, tallies, totalVotes }) => (
-        <section key={category.id} className="rounded-xl border bg-white p-4 sm:p-6">
-          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold">{category.name}</h2>
-              <p className="text-sm text-slate-600">{category.subcategory}</p>
-            </div>
-            <p className="text-sm text-slate-500">{totalVotes} total votes</p>
-          </div>
-          {winner ? (
-            <p className="mb-4 rounded-lg bg-orange-50 px-3 py-2 text-sm text-orange-900">
-              Winner: <Badge variant="outline" className="mx-1">{winner.uniqueId}</Badge>
-              <strong>{winner.dogName}</strong> · {winner.votes} vote
-              {winner.votes === 1 ? "" : "s"}
-            </p>
-          ) : (
-            <p className="mb-4 text-sm text-slate-400">No votes yet</p>
-          )}
-          <div className="space-y-2">
-            {tallies.map((row) => (
-              <div
-                key={row.uniqueId}
-                className="flex items-center gap-3 rounded-lg border border-slate-100 p-2"
-              >
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-orange-50">
-                  <DogPhoto
-                    src={row.photoUrl}
-                    alt={row.dogName}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">
-                    <span className="mr-2 text-orange-800">{row.uniqueId}</span>
-                    {row.dogName}
-                  </p>
-                  <p className="truncate text-xs text-slate-500">
-                    {row.costumeDescription}
-                  </p>
-                </div>
-                <p className="shrink-0 text-sm font-semibold">{row.votes}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
+      <WinnerPicker categories={results} />
     </div>
   );
 }

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import type { AdminDogRow } from "@/components/admin/dog-table";
+import { rankLabel, rankTone } from "@/lib/ranking";
+import { cn } from "@/lib/utils";
 
 export function FinalistPicker({
   dogs,
@@ -56,13 +58,21 @@ export function FinalistPicker({
               Round {roundNumber} votes
             </h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {roundDogs.map((dog) => (
+              {roundDogs.map((dog, index) => (
                 <Card
                   key={dog.id}
                   className="cursor-pointer overflow-hidden"
                   onClick={() => toggle(dog.id)}
                 >
                   <div className="flex items-center gap-3 p-3">
+                    <span
+                      className={cn(
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+                        rankTone(index),
+                      )}
+                    >
+                      {rankLabel(index)}
+                    </span>
                     <Checkbox
                       checked={selected.has(dog.id)}
                       onCheckedChange={() => toggle(dog.id)}

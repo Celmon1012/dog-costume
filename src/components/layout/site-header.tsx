@@ -6,6 +6,7 @@ const links = [
   { href: "/register", label: "Signup" },
   { href: "/contest", label: "Contestants" },
   { href: "/vote", label: "Vote" },
+  { href: "/winners", label: "Winners" },
 ];
 
 export function SiteHeader() {

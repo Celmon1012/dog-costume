@@ -65,6 +65,13 @@ export function StartVotingCard({
             ({finalistCount} selected).
           </li>
           <li>Start prize voting. Guests use /vote for the five awards.</li>
+          <li>
+            On{" "}
+            <Link href="/admin/results" className="text-orange-700 underline">
+              Results
+            </Link>
+            , pick a winner per category. Guests then see /winners.
+          </li>
         </ol>
         <div className="flex flex-wrap gap-2">
           <Button type="button" onClick={start} loading={busy} disabled={busy || finalistCount === 0}>

@@ -42,10 +42,8 @@ export function DogRouteLoader() {
   if (!pending) return null;
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#f6f1ea]/75 backdrop-blur-[2px]">
-      <div className="rounded-3xl bg-white px-10 py-8 shadow-xl ring-1 ring-orange-100">
-        <DogLoader size="lg" label="Fetching the good dogs…" />
-      </div>
+    <div className="fixed inset-0 z-[80] flex h-dvh w-screen items-center justify-center bg-[#f6f1ea]/80 backdrop-blur-[2px]">
+      <DogLoader size="lg" label="Fetching the good dogs…" />
     </div>
   );
 }

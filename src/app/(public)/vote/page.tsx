@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { VoteForm } from "@/components/vote/vote-form";
 import { createClient } from "@/lib/supabase/server";
 
@@ -11,7 +12,7 @@ export default async function VotePage() {
     await Promise.all([
       supabase
         .from("site_settings")
-        .select("voting_open")
+        .select("voting_open, winners_announced")
         .eq("id", "default")
         .maybeSingle(),
       supabase
@@ -65,6 +66,14 @@ export default async function VotePage() {
           votingOpen={settings?.voting_open ?? false}
           existingCategoryIds={[]}
         />
+        {settings?.winners_announced ? (
+          <p className="mt-6 text-center text-sm text-slate-600">
+            Winners have been announced.{" "}
+            <Link href="/winners" className="font-medium text-orange-700 underline">
+              See congratulations
+            </Link>
+          </p>
+        ) : null}
       </div>
     </div>
   );

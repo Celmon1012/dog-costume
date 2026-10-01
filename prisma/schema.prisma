@@ -15,9 +15,10 @@ enum RoundStatus {
 }
 
 model SiteSettings {
-  id         String   @id @default("default")
-  votingOpen Boolean  @default(false) @map("voting_open")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id                String   @id @default("default")
+  votingOpen        Boolean  @default(false) @map("voting_open")
+  winnersAnnounced  Boolean  @default(false) @map("winners_announced")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("site_settings")
 }
@@ -58,6 +59,7 @@ model Dog {
   updatedAt          DateTime @updatedAt @map("updated_at")
   votes              Vote[]
   roundVotes         RoundVote[]
+  prizeWins          PrizeCategory[]
 
   @@index([roundNumber])
   @@index([isFinalist])
@@ -69,6 +71,8 @@ model PrizeCategory {
   name        String
   subcategory String
   sortOrder   Int    @unique @map("sort_order")
+  winnerDogId String? @map("winner_dog_id")
+  winner      Dog?    @relation(fields: [winnerDogId], references: [id], onDelete: SetNull)
   votes       Vote[]
 
   @@map("prize_categories")
