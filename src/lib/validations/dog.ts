@@ -8,13 +8,13 @@ export const dogRegistrationSchema = z.object({
     .string()
     .min(7, "Phone number is too short")
     .max(20, "Phone number is too long"),
-  breed: z.string().max(80).optional().default(""),
+  breed: z.string().max(80),
   costumeDescription: z
     .string()
     .min(3, "What are they dressed as?")
     .max(500, "Keep this under 500 characters"),
-  inspiration: z.string().max(500).optional().default(""),
-  funnyFact: z.string().max(500).optional().default(""),
+  inspiration: z.string().max(500),
+  funnyFact: z.string().max(500),
 });
 
 export type DogRegistrationInput = z.infer<typeof dogRegistrationSchema>;

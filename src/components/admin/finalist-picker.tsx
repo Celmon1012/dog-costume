@@ -5,7 +5,7 @@ import { DogPhoto } from "@/components/dogs/dog-photo";
 import { setFinalists } from "@/actions/dogs";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import type { AdminDogRow } from "@/components/admin/dog-table";
 
 export function FinalistPicker({ dogs }: { dogs: AdminDogRow[] }) {
