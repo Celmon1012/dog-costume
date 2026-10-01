@@ -149,7 +149,7 @@ export function VoteForm({
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="mx-auto w-full max-w-4xl space-y-4">
       <div className="flex items-center justify-between text-sm text-slate-600">
         <span>
           Category {step + 1} of {sortedCategories.length}

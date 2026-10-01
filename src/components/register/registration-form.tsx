@@ -85,7 +85,7 @@ export function RegistrationForm() {
   }
 
   return (
-    <Card className="mx-auto max-w-xl">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Register your dog</CardTitle>
         <CardDescription>

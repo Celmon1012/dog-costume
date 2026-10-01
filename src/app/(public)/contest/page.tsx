@@ -57,7 +57,7 @@ export default async function ContestPage() {
 
   return (
     <div className="bg-[#f6f1ea] pb-12">
-      <div className="relative h-40 w-full overflow-hidden sm:h-52">
+      <div className="relative h-48 w-full overflow-hidden sm:h-64">
         <Image
           src="/images/hero-dogs.jpg"
           alt="Costume contest dogs"
@@ -66,7 +66,7 @@ export default async function ContestPage() {
           priority
         />
         <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-0 flex items-end px-4 py-6">
+        <div className="absolute inset-0 flex items-end px-4 py-6 sm:px-6">
           <div className="mx-auto w-full max-w-6xl text-white">
             <h1 className="text-3xl font-bold">Contestants</h1>
             <p className="mt-1 text-sm text-white/90">
@@ -79,7 +79,7 @@ export default async function ContestPage() {
           </div>
         </div>
       </div>
-      <div className="mx-auto max-w-6xl space-y-10 px-4 py-8">
+      <div className="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
         {!sections.length ? (
           <p className="rounded-lg border border-dashed border-orange-200 bg-white/70 p-8 text-center text-slate-600">
             Contestants appear after the emcee opens a round.
