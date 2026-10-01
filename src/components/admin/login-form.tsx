@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,15 +60,8 @@ export function LoginForm({ initialError }: { initialError?: string }) {
         />
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Signing in...
-          </>
-        ) : (
-          "Sign in"
-        )}
+      <Button type="submit" className="w-full" loading={pending}>
+        {pending ? "Signing in..." : "Sign in"}
       </Button>
     </form>
   );

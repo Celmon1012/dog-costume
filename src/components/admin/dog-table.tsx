@@ -200,7 +200,7 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
                   }
                 />
               </div>
-              <Button onClick={handleSave} disabled={busy === editing.id}>
+              <Button onClick={handleSave} loading={busy === editing.id}>
                 Save changes
               </Button>
             </div>

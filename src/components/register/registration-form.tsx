@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
 import { registerDog } from "@/actions/dogs";
 import {
@@ -240,15 +240,8 @@ export function RegistrationForm() {
                 {status.text}
               </p>
             ) : null}
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                "Register"
-              )}
+            <Button type="submit" className="w-full" loading={submitting}>
+              {submitting ? "Submitting..." : "Register"}
             </Button>
           </form>
         </Form>

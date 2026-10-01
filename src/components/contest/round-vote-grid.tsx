@@ -77,13 +77,14 @@ export function RoundVoteGrid({
                   className="w-full"
                   variant={picked ? "default" : "outline"}
                   disabled={busy || !!doneId}
+                  loading={busy && picked && !doneId}
                   onClick={() => vote(dog.id)}
                 >
                   {doneId
                     ? picked
                       ? "Your pick"
                       : "Voted"
-                    : picked
+                    : picked && busy
                       ? "Voting..."
                       : "Vote for this dog"}
                 </Button>

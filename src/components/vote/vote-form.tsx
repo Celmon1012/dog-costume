@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { DogPhoto } from "@/components/dogs/dog-photo";
 import { submitVotes } from "@/actions/votes";
 import { Button } from "@/components/ui/button";
@@ -234,6 +233,7 @@ export function VoteForm({
           <Button
             type="button"
             className="flex-1"
+            loading={submitting}
             disabled={
               submitting ||
               !voterEmail.trim() ||
@@ -243,14 +243,7 @@ export function VoteForm({
             }
             onClick={handleSubmit}
           >
-            {submitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              "Submit all votes"
-            )}
+            {submitting ? "Submitting..." : "Submit all votes"}
           </Button>
         )}
       </div>

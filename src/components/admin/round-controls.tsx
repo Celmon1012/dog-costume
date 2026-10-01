@@ -51,6 +51,7 @@ export function RoundControls({
           </Badge>
           <Button
             variant="default"
+            loading={busy === "voting-open"}
             disabled={busy != null}
             onClick={() => toggleVoting(true)}
           >
@@ -58,6 +59,7 @@ export function RoundControls({
           </Button>
           <Button
             variant="outline"
+            loading={busy === "voting-close"}
             disabled={busy != null}
             onClick={() => toggleVoting(false)}
           >
@@ -93,6 +95,7 @@ export function RoundControls({
               <div className="flex flex-wrap gap-2">
                 <Button
                   size="sm"
+                  loading={busy === `${round.roundNumber}-OPEN`}
                   disabled={busy != null}
                   onClick={() => updateRound(round.roundNumber, "OPEN")}
                 >
@@ -101,6 +104,7 @@ export function RoundControls({
                 <Button
                   size="sm"
                   variant="outline"
+                  loading={busy === `${round.roundNumber}-CLOSED`}
                   disabled={busy != null}
                   onClick={() => updateRound(round.roundNumber, "CLOSED")}
                 >
@@ -109,6 +113,7 @@ export function RoundControls({
                 <Button
                   size="sm"
                   variant="secondary"
+                  loading={busy === `${round.roundNumber}-COMPLETED`}
                   disabled={busy != null}
                   onClick={() => updateRound(round.roundNumber, "COMPLETED")}
                 >

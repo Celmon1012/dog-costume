@@ -93,7 +93,7 @@ export function FinalistPicker({
           </section>
         );
       })}
-      <Button onClick={save} disabled={saving}>
+      <Button onClick={save} loading={saving}>
         {saving ? "Saving..." : "Save finalists"}
       </Button>
       {message ? <p className="text-sm text-emerald-700">{message}</p> : null}

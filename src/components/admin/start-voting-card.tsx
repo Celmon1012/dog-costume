@@ -67,10 +67,10 @@ export function StartVotingCard({
           <li>Start prize voting. Guests use /vote for the five awards.</li>
         </ol>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" onClick={start} disabled={busy || finalistCount === 0}>
+          <Button type="button" onClick={start} loading={busy} disabled={busy || finalistCount === 0}>
             {busy ? "Starting..." : "Start prize voting"}
           </Button>
-          <Button type="button" variant="outline" onClick={stop} disabled={busy}>
+          <Button type="button" variant="outline" onClick={stop} loading={busy} disabled={busy}>
             Close voting
           </Button>
           <Button type="button" variant="secondary" asChild>
