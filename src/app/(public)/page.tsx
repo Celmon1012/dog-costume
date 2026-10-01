@@ -81,7 +81,7 @@ export default function HomePage() {
       </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <section className="-mt-10 grid gap-4 sm:grid-cols-3">
+        <section className="mt-10 grid gap-4 sm:grid-cols-3">
           {steps.map(({ icon: Icon, title, blurb }) => (
             <div
               key={title}
