@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { DogPhoto } from "@/components/dogs/dog-photo";
 import { setFinalists } from "@/actions/dogs";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -47,11 +47,10 @@ export function FinalistPicker({ dogs }: { dogs: AdminDogRow[] }) {
                 onCheckedChange={() => toggle(dog.id)}
               />
               <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md">
-                <Image
+                <DogPhoto
                   src={dog.photoUrl}
                   alt={dog.dogName}
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
               <div>

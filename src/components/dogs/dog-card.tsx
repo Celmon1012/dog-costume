@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DogPhoto } from "@/components/dogs/dog-photo";
 
 type DogCardProps = {
   uniqueId: string;
@@ -24,12 +24,10 @@ export function DogCard({
   return (
     <Card className="overflow-hidden">
       <div className="relative aspect-square w-full bg-orange-50">
-        <Image
+        <DogPhoto
           src={photoUrl}
           alt={`${dogName} costume`}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 33vw"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
       <CardHeader className="pb-2">

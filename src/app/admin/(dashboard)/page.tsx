@@ -1,27 +1,20 @@
 import { StartVotingCard } from "@/components/admin/start-voting-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  await requireAdmin();
   const supabase = await createClient();
 
   const [
-    { count: dogCount },
+    { data: dogRows },
     { count: voteCount },
-    { count: finalistCount },
     { data: activeRound },
     { data: settings },
   ] = await Promise.all([
-    supabase.from("dogs").select("*", { count: "exact", head: true }),
-    supabase.from("votes").select("*", { count: "exact", head: true }),
-    supabase
-      .from("dogs")
-      .select("*", { count: "exact", head: true })
-      .eq("is_finalist", true),
+    supabase.from("dogs").select("id"),
+    supabase.from("votes").select("id", { count: "exact", head: true }),
     supabase
       .from("rounds")
       .select("round_number")
@@ -35,6 +28,8 @@ export default async function AdminDashboardPage() {
       .eq("id", "default")
       .maybeSingle(),
   ]);
+
+  const dogCount = dogRows?.length ?? 0;
 
   return (
     <div className="space-y-8">
@@ -50,7 +45,6 @@ export default async function AdminDashboardPage() {
             value: activeRound ? `Round ${activeRound.round_number}` : "None open",
           },
           { label: "Total votes", value: voteCount ?? 0 },
-          { label: "Finalists", value: finalistCount ?? 0 },
         ].map((stat) => (
           <Card key={stat.label}>
             <CardHeader className="pb-2">
@@ -65,7 +59,6 @@ export default async function AdminDashboardPage() {
       <StartVotingCard
         votingOpen={settings?.voting_open ?? false}
         dogCount={dogCount ?? 0}
-        finalistCount={finalistCount ?? 0}
       />
     </div>
   );

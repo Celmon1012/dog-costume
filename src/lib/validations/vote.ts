@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const voteSubmissionSchema = z.object({
+  voterEmail: z.string().trim().email("Enter a valid email"),
   votes: z
     .array(
       z.object({

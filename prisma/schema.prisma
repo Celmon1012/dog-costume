@@ -75,11 +75,13 @@ model Vote {
   dogId           String   @map("dog_id")
   prizeCategoryId String   @map("prize_category_id")
   voterIdentifier String   @map("voter_identifier")
+  voterEmail      String?  @map("voter_email")
   createdAt       DateTime @default(now()) @map("created_at")
   dog             Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
   prizeCategory   PrizeCategory @relation(fields: [prizeCategoryId], references: [id], onDelete: Cascade)
 
   @@unique([prizeCategoryId, voterIdentifier])
+  @@unique([prizeCategoryId, voterEmail])
   @@index([dogId])
   @@map("votes")
 }

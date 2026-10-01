@@ -10,11 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export function StartVotingCard({
   votingOpen,
   dogCount,
-  finalistCount,
 }: {
   votingOpen: boolean;
   dogCount: number;
-  finalistCount: number;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,18 +52,11 @@ export function StartVotingCard({
       <CardContent className="space-y-4">
         <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-600">
           <li>
-            Dogs registered: <strong>{dogCount}</strong>
+            Finish displaying every round on Contestants ({dogCount} dogs
+            registered).
           </li>
-          <li>
-            Finalists selected: <strong>{finalistCount}</strong>
-            {finalistCount === 0 && dogCount > 0
-              ? " — Start voting will use every registered dog."
-              : null}{" "}
-            <Link href="/admin/finalists" className="text-orange-700 underline">
-              Pick finalists
-            </Link>
-          </li>
-          <li>Click Start voting, then send people to /vote</li>
+          <li>Open voting only after the last round is on stage.</li>
+          <li>Audience picks one dog in each of the five prize categories.</li>
         </ol>
         <div className="flex flex-wrap gap-2">
           <Button type="button" onClick={start} disabled={busy}>

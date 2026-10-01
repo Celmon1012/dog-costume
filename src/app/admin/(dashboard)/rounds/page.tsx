@@ -1,12 +1,10 @@
 import { RoundControls } from "@/components/admin/round-controls";
 import type { RoundStatus } from "@/actions/rounds";
-import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminRoundsPage() {
-  await requireAdmin();
   const supabase = await createClient();
 
   const [{ data: roundRows }, { data: settings }, { data: dogs }] =

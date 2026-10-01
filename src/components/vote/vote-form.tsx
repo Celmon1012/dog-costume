@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import { Loader2 } from "lucide-react";
+import { DogPhoto } from "@/components/dogs/dog-photo";
 import { submitVotes } from "@/actions/votes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 export type VoteCategory = {
@@ -42,6 +44,7 @@ export function VoteForm({
   );
 
   const [selections, setSelections] = useState<Record<string, string>>({});
+  const [voterEmail, setVoterEmail] = useState("");
   const [step, setStep] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +83,7 @@ export function VoteForm({
         dogId: selections[cat.id],
       }))
       .filter((v) => v.dogId);
-    const result = await submitVotes({ votes });
+    const result = await submitVotes({ votes, voterEmail });
     setSubmitting(false);
     if (result.ok) {
       setMessage(result.message);
@@ -96,8 +99,7 @@ export function VoteForm({
           <CardTitle>Voting opens soon</CardTitle>
         </CardHeader>
         <CardContent className="text-slate-600">
-          The emcee will announce when voting is live. Finalists will appear
-          here — one vote per category on this device.
+          The emcee will open voting after every round is on stage. Results stay hidden until then.
         </CardContent>
       </Card>
     );
@@ -107,10 +109,10 @@ export function VoteForm({
     return (
       <Card className="mx-auto max-w-lg text-center">
         <CardHeader>
-          <CardTitle>No finalists yet</CardTitle>
+          <CardTitle>No contestants yet</CardTitle>
         </CardHeader>
         <CardContent className="text-slate-600">
-          Check back after the judges pick finalists.
+          Dogs will appear here after they are registered.
         </CardContent>
       </Card>
     );
@@ -177,12 +179,10 @@ export function VoteForm({
               )}
             >
               <div className="relative aspect-square w-full bg-orange-50">
-                <Image
+                <DogPhoto
                   src={dog.photoUrl}
                   alt={dog.dogName}
-                  fill
-                  className="object-cover"
-                  sizes="160px"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
               <div className="space-y-0.5 p-2">
@@ -190,12 +190,27 @@ export function VoteForm({
                   {dog.uniqueId}
                 </p>
                 <p className="text-sm font-medium">{dog.dogName}</p>
+                <p className="line-clamp-2 text-xs text-slate-500">
+                  {dog.costumeDescription}
+                </p>
               </div>
             </button>
           );
         })}
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      <div>
+        <Label htmlFor="voter-email">Your email</Label>
+        <Input
+          id="voter-email"
+          type="email"
+          required
+          value={voterEmail}
+          onChange={(event) => setVoterEmail(event.target.value)}
+          placeholder="Used once per prize category"
+          className="mt-1"
+        />
+      </div>
       <div className="flex gap-2">
         <Button
           type="button"
@@ -220,6 +235,7 @@ export function VoteForm({
             className="flex-1"
             disabled={
               submitting ||
+              !voterEmail.trim() ||
               sortedCategories
                 .filter((c) => !existingCategoryIds.includes(c.id))
                 .some((c) => !selections[c.id])

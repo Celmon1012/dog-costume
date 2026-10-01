@@ -25,7 +25,10 @@ export async function submitVotes(
 
   const parsed = voteSubmissionSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: "Please pick one dog in every category." };
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Please pick one dog in every category.",
+    };
   }
 
   const categoryIds = parsed.data.votes.map((v) => v.prizeCategoryId);
@@ -38,14 +41,13 @@ export async function submitVotes(
     return { ok: false, error: "Could not identify this device. Refresh and try again." };
   }
 
-  const { data: finalists } = await supabase
-    .from("dogs")
-    .select("id")
-    .eq("is_finalist", true);
-  const finalistSet = new Set((finalists ?? []).map((d) => d.id));
+  const voterEmail = parsed.data.voterEmail.trim().toLowerCase();
+
+  const { data: contestants } = await supabase.from("dogs").select("id");
+  const contestantSet = new Set((contestants ?? []).map((d) => d.id));
 
   for (const vote of parsed.data.votes) {
-    if (!finalistSet.has(vote.dogId)) {
+    if (!contestantSet.has(vote.dogId)) {
       return { ok: false, error: "Invalid contestant selected." };
     }
   }
@@ -56,15 +58,17 @@ export async function submitVotes(
       dog_id: vote.dogId,
       prize_category_id: vote.prizeCategoryId,
       voter_identifier: voterIdentifier,
+      voter_email: voterEmail,
     })),
   );
 
   if (error) {
     return {
       ok: false,
-      error: error.message.includes("duplicate")
-        ? "You already voted in one or more categories on this device."
-        : "Could not save votes. You may have already voted.",
+      error:
+        error.message.includes("duplicate") || error.code === "23505"
+          ? "This device or email already voted in one or more categories."
+          : "Could not save votes. You may have already voted.",
     };
   }
 

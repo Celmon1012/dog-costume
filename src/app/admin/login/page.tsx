@@ -1,8 +1,5 @@
-import { signInWithPassword } from "@/actions/auth";
-import { Button } from "@/components/ui/button";
+import { LoginForm } from "@/components/admin/login-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export default async function AdminLoginPage({
   searchParams,
@@ -17,26 +14,7 @@ export default async function AdminLoginPage({
           <CardTitle>Admin sign in</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={signInWithPassword} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" required />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required />
-            </div>
-            {params.error ? (
-              <p className="text-sm text-red-600">
-                {params.error === "unauthorized"
-                  ? "This account is not on the admin list. Check ADMIN_EMAILS in .env.local."
-                  : decodeURIComponent(params.error)}
-              </p>
-            ) : null}
-            <Button type="submit" className="w-full">
-              Sign in
-            </Button>
-          </form>
+          <LoginForm initialError={params.error} />
         </CardContent>
       </Card>
     </div>

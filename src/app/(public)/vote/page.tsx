@@ -2,7 +2,7 @@ import Image from "next/image";
 import { VoteForm } from "@/components/vote/vote-form";
 import { createClient } from "@/lib/supabase/server";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 10;
 
 export default async function VotePage() {
   const supabase = await createClient();
@@ -20,9 +20,11 @@ export default async function VotePage() {
         .order("sort_order", { ascending: true }),
       supabase
         .from("dogs")
-        .select("id, unique_id, dog_name, photo_url, costume_description")
-        .eq("is_finalist", true)
-        .order("unique_id", { ascending: true }),
+        .select(
+          "id, unique_id, dog_name, photo_url, costume_description, round_number, display_order",
+        )
+        .order("round_number", { ascending: true })
+        .order("display_order", { ascending: true }),
     ]);
 
   return (
@@ -40,7 +42,7 @@ export default async function VotePage() {
           <div className="mx-auto w-full max-w-xl text-white">
             <h1 className="text-3xl font-bold">Vote</h1>
             <p className="mt-1 text-sm text-white/90">
-              Pick one dog per prize category when voting is open.
+              One dog per prize category. You can vote in all five awards.
             </p>
           </div>
         </div>

@@ -44,7 +44,7 @@ export async function setRoundStatus(
   if (status === "OPEN") {
     const { error } = await supabase
       .from("rounds")
-      .update({ status: "CLOSED", updated_at: now })
+      .update({ status: "COMPLETED", updated_at: now })
       .neq("round_number", roundNumber)
       .eq("status", "OPEN");
     if (error) return { ok: false, error: error.message };
@@ -130,27 +130,6 @@ export async function startAudienceVoting(): Promise<ActionResult> {
       ok: false,
       error: "Register at least one dog before opening voting.",
     };
-  }
-
-  const { count: finalistCount } = await supabase
-    .from("dogs")
-    .select("*", { count: "exact", head: true })
-    .eq("is_finalist", true);
-
-  if (!finalistCount) {
-    const { error } = await supabase
-      .from("dogs")
-      .update({ is_finalist: true, updated_at: now })
-      .neq("id", "");
-    if (error) {
-      return {
-        ok: false,
-        error:
-          error.message.includes("row-level security")
-            ? "Could not mark finalists. Run supabase/fix_admin.sql, then try again."
-            : error.message,
-      };
-    }
   }
 
   const { error } = await supabase.from("site_settings").upsert({

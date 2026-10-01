@@ -11,20 +11,26 @@ const voterCookieOptions = {
 };
 
 export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
   const existingVoter = request.cookies.get(VOTER_COOKIE)?.value;
   const voterId = existingVoter ?? crypto.randomUUID();
 
-  let supabaseResponse = NextResponse.next({ request });
-  if (!existingVoter) {
-    supabaseResponse.cookies.set(VOTER_COOKIE, voterId, voterCookieOptions);
+  // Public pages skip Supabase auth — that extra round-trip made every click lag.
+  if (!path.startsWith("/admin")) {
+    const response = NextResponse.next({ request });
+    if (!existingVoter && (path === "/vote" || path.startsWith("/vote/"))) {
+      response.cookies.set(VOTER_COOKIE, voterId, voterCookieOptions);
+    }
+    return response;
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
-    return supabaseResponse;
+    return NextResponse.next({ request });
   }
 
+  let supabaseResponse = NextResponse.next({ request });
   const supabase = createServerClient(url, anonKey, {
     cookies: {
       getAll() {
@@ -44,50 +50,35 @@ export async function middleware(request: NextRequest) {
         cookiesToSet.forEach(({ name, value, options }) =>
           supabaseResponse.cookies.set(name, value, options),
         );
-        if (!existingVoter) {
-          supabaseResponse.cookies.set(
-            VOTER_COOKIE,
-            voterId,
-            voterCookieOptions,
-          );
-        }
       },
     },
   });
+
+  const isLogin = path === "/admin/login" || path.startsWith("/admin/login/");
+  if (isLogin) {
+    return supabaseResponse;
+  }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
-  if (
-    path.startsWith("/admin") &&
-    path !== "/admin/login" &&
-    !path.startsWith("/admin/login/")
-  ) {
-    const adminEmails = (process.env.ADMIN_EMAILS ?? "")
-      .split(",")
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
+  const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
 
-    const email = user?.email?.toLowerCase();
-    if (!email || !adminEmails.includes(email)) {
-      const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = "/admin/login";
-      loginUrl.search = email ? "?error=unauthorized" : "";
-      const redirect = NextResponse.redirect(loginUrl);
-      if (!existingVoter) {
-        redirect.cookies.set(VOTER_COOKIE, voterId, voterCookieOptions);
-      }
-      return redirect;
-    }
+  const email = user?.email?.toLowerCase();
+  if (!email || !adminEmails.includes(email)) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/admin/login";
+    loginUrl.search = email ? "?error=unauthorized" : "";
+    return NextResponse.redirect(loginUrl);
   }
 
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/admin/:path*", "/vote", "/vote/:path*"],
 };

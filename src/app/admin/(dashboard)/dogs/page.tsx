@@ -1,12 +1,10 @@
 import { DogTable } from "@/components/admin/dog-table";
-import { requireAdmin } from "@/lib/auth";
 import { mapDog, type DogRecord } from "@/lib/supabase/map-dog";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDogsPage() {
-  await requireAdmin();
   const supabase = await createClient();
   const { data } = await supabase
     .from("dogs")

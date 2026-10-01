@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Pencil, Trash2 } from "lucide-react";
+import { DogPhoto } from "@/components/dogs/dog-photo";
 import { deleteDog, toggleFinalist, updateDog } from "@/actions/dogs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -79,11 +79,10 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
               <TableRow key={dog.id}>
                 <TableCell>
                   <div className="relative h-12 w-12 overflow-hidden rounded-md">
-                    <Image
+                    <DogPhoto
                       src={dog.photoUrl}
                       alt={dog.dogName}
-                      fill
-                      className="object-cover"
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
                   </div>
                 </TableCell>
