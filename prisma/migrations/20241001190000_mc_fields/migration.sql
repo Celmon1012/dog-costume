@@ -1,0 +1,6 @@
+-- Add MC script fields and allow empty photos.
+
+ALTER TABLE "dogs" ADD COLUMN IF NOT EXISTS "breed" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "dogs" ADD COLUMN IF NOT EXISTS "inspiration" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "dogs" ADD COLUMN IF NOT EXISTS "funny_fact" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "dogs" ALTER COLUMN "photo_url" SET DEFAULT '';

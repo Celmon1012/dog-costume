@@ -7,6 +7,9 @@ export type AdminDogRow = {
   ownerPhone: string;
   photoUrl: string;
   costumeDescription: string;
+  breed: string;
+  inspiration: string;
+  funnyFact: string;
   roundNumber: number;
   displayOrder: number;
   isFinalist: boolean;
@@ -21,10 +24,16 @@ export type DogRecord = {
   owner_phone: string;
   photo_url: string;
   costume_description: string;
+  breed?: string | null;
+  inspiration?: string | null;
+  funny_fact?: string | null;
   round_number: number;
   display_order: number;
   is_finalist: boolean;
 };
+
+export const DOG_SELECT =
+  "id, unique_id, dog_name, owner_name, owner_email, owner_phone, photo_url, costume_description, breed, inspiration, funny_fact, round_number, display_order, is_finalist";
 
 export function mapDog(row: DogRecord): AdminDogRow {
   return {
@@ -34,8 +43,11 @@ export function mapDog(row: DogRecord): AdminDogRow {
     ownerName: row.owner_name,
     ownerEmail: row.owner_email,
     ownerPhone: row.owner_phone,
-    photoUrl: row.photo_url,
+    photoUrl: row.photo_url ?? "",
     costumeDescription: row.costume_description,
+    breed: row.breed ?? "",
+    inspiration: row.inspiration ?? "",
+    funnyFact: row.funny_fact ?? "",
     roundNumber: row.round_number,
     displayOrder: row.display_order,
     isFinalist: row.is_finalist,

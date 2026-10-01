@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Upload } from "lucide-react";
@@ -24,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function RegistrationForm() {
+  const router = useRouter();
   const [photo, setPhoto] = useState<File | null>(null);
   const [status, setStatus] = useState<{ type: "ok" | "err"; text: string } | null>(
     null,
@@ -37,27 +39,35 @@ export function RegistrationForm() {
       ownerName: "",
       ownerEmail: "",
       ownerPhone: "",
+      breed: "",
       costumeDescription: "",
+      inspiration: "",
+      funnyFact: "",
     },
   });
 
   async function onSubmit(values: DogRegistrationInput) {
-    if (!photo) {
-      setStatus({ type: "err", text: "Please upload a dog photo." });
-      return;
-    }
     setSubmitting(true);
     setStatus(null);
     try {
-      const compressed = await compressImage(photo);
       const fd = new FormData();
-      Object.entries(values).forEach(([key, value]) => fd.append(key, value));
-      fd.append("photo", compressed);
+      Object.entries(values).forEach(([key, value]) => fd.append(key, value ?? ""));
+      if (photo) {
+        fd.append("photo", await compressImage(photo));
+      }
       const result = await registerDog(fd);
+      if (result.ok && result.uniqueId) {
+        const params = new URLSearchParams({
+          id: result.uniqueId,
+          name: values.dogName,
+        });
+        router.push(`/register/thanks?${params.toString()}`);
+        return;
+      }
       if (result.ok) {
         setStatus({
           type: "ok",
-          text: result.message ?? `Registered as ${result.uniqueId}`,
+          text: result.message ?? "Registered",
         });
         form.reset();
         setPhoto(null);
@@ -79,7 +89,7 @@ export function RegistrationForm() {
       <CardHeader>
         <CardTitle>Register your dog</CardTitle>
         <CardDescription>
-          Sign up on event day — you&apos;ll get a contestant ID like DOG-001
+          Sign up once — you&apos;ll get a contestant ID like DOG-001
           automatically.
         </CardDescription>
       </CardHeader>
@@ -94,6 +104,19 @@ export function RegistrationForm() {
                   <FormLabel>Dog name</FormLabel>
                   <FormControl>
                     <Input placeholder="Max" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="breed"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Breed (optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Golden retriever mix" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,10 +168,39 @@ export function RegistrationForm() {
               name="costumeDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Costume description</FormLabel>
+                  <FormLabel>What are they dressed as?</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Batman cape and mask..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="inspiration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Costume inspiration (optional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Batman cape and mask..."
+                      placeholder="We saw this in a movie / family tradition..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="funnyFact"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Funny fact or personality (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Steals socks, afraid of broccoli..."
                       {...field}
                     />
                   </FormControl>
@@ -157,13 +209,17 @@ export function RegistrationForm() {
               )}
             />
             <div className="space-y-2">
-              <FormLabel>Dog photo</FormLabel>
+              <FormLabel>Dog photo (optional)</FormLabel>
+              <p className="text-sm text-slate-500">
+                This will help showcase your dog for voting and remind everyone
+                of their awesome costume.
+              </p>
               <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-orange-200 bg-orange-50/50 px-4 py-8 text-center hover:bg-orange-50">
                 <Upload className="mb-2 h-8 w-8 text-orange-600" />
                 <span className="text-sm text-slate-600">
                   {photo
                     ? photo.name
-                    : "Tap to upload — phone photos are compressed automatically"}
+                    : "Tap to upload — skip if you prefer"}
                 </span>
                 <input
                   type="file"

@@ -1,5 +1,5 @@
 import { FinalistPicker } from "@/components/admin/finalist-picker";
-import { mapDog, type DogRecord } from "@/lib/supabase/map-dog";
+import { mapDog, DOG_SELECT, type DogRecord } from "@/lib/supabase/map-dog";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -8,9 +8,7 @@ export default async function AdminFinalistsPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("dogs")
-    .select(
-      "id, unique_id, dog_name, owner_name, owner_email, owner_phone, photo_url, costume_description, round_number, display_order, is_finalist",
-    )
+    .select(DOG_SELECT)
     .order("unique_id", { ascending: true });
 
   const dogs = ((data ?? []) as DogRecord[]).map(mapDog);

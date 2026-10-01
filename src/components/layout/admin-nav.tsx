@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/admin", label: "Dashboard" },
+  { href: "/admin/script", label: "MC script" },
   { href: "/admin/dogs", label: "Dogs" },
-  { href: "/admin/finalists", label: "Finalists" },
   { href: "/admin/rounds", label: "Rounds" },
   { href: "/admin/results", label: "Results" },
 ];

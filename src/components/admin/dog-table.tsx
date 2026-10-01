@@ -24,20 +24,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
+import type { AdminDogRow } from "@/lib/supabase/map-dog";
 
-export type AdminDogRow = {
-  id: string;
-  uniqueId: string;
-  dogName: string;
-  ownerName: string;
-  ownerEmail: string;
-  ownerPhone: string;
-  photoUrl: string;
-  costumeDescription: string;
-  roundNumber: number;
-  displayOrder: number;
-  isFinalist: boolean;
-};
+export type { AdminDogRow };
 
 export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
   const [editing, setEditing] = useState<AdminDogRow | null>(null);
@@ -173,6 +162,15 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
                 />
               </div>
               <div>
+                <Label>Breed</Label>
+                <Input
+                  value={editing.breed}
+                  onChange={(e) =>
+                    setEditing({ ...editing, breed: e.target.value })
+                  }
+                />
+              </div>
+              <div>
                 <Label>Costume</Label>
                 <Textarea
                   value={editing.costumeDescription}
@@ -181,6 +179,24 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
                       ...editing,
                       costumeDescription: e.target.value,
                     })
+                  }
+                />
+              </div>
+              <div>
+                <Label>Inspiration</Label>
+                <Textarea
+                  value={editing.inspiration}
+                  onChange={(e) =>
+                    setEditing({ ...editing, inspiration: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label>Fun fact</Label>
+                <Textarea
+                  value={editing.funnyFact}
+                  onChange={(e) =>
+                    setEditing({ ...editing, funnyFact: e.target.value })
                   }
                 />
               </div>

@@ -21,7 +21,10 @@ export async function registerDog(formData: FormData): Promise<ActionResult> {
     ownerName: formData.get("ownerName"),
     ownerEmail: formData.get("ownerEmail"),
     ownerPhone: formData.get("ownerPhone"),
+    breed: formData.get("breed") ?? "",
     costumeDescription: formData.get("costumeDescription"),
+    inspiration: formData.get("inspiration") ?? "",
+    funnyFact: formData.get("funnyFact") ?? "",
   });
 
   if (!parsed.success) {
@@ -29,41 +32,45 @@ export async function registerDog(formData: FormData): Promise<ActionResult> {
   }
 
   const photo = formData.get("photo");
-  if (!(photo instanceof File) || photo.size === 0) {
-    return { ok: false, error: "Please upload a dog photo" };
-  }
+  const hasPhoto = photo instanceof File && photo.size > 0;
 
-  if (!photo.type.startsWith("image/")) {
-    return { ok: false, error: "Photo must be an image file" };
-  }
-
-  if (photo.size > 5 * 1024 * 1024) {
-    return { ok: false, error: "Photo must be under 5MB" };
+  if (hasPhoto) {
+    if (!photo.type.startsWith("image/")) {
+      return { ok: false, error: "Photo must be an image file" };
+    }
+    if (photo.size > 5 * 1024 * 1024) {
+      return { ok: false, error: "Photo must be under 5MB" };
+    }
   }
 
   try {
     const supabase = await createClient();
-    const ext = photo.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const path = `uploads/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const buffer = Buffer.from(await photo.arrayBuffer());
+    let photoUrl = "";
 
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(path, buffer, {
-        contentType: photo.type,
-        upsert: false,
-      });
+    if (hasPhoto && photo instanceof File) {
+      const ext = photo.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const path = `uploads/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const buffer = Buffer.from(await photo.arrayBuffer());
 
-    if (uploadError) {
-      return {
-        ok: false,
-        error: uploadError.message.toLowerCase().includes("bucket")
-          ? "Photo bucket is missing. In Supabase Storage, create a public bucket named dog-photos."
-          : `Photo upload failed: ${uploadError.message}`,
-      };
+      const { error: uploadError } = await supabase.storage
+        .from(BUCKET)
+        .upload(path, buffer, {
+          contentType: photo.type,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        return {
+          ok: false,
+          error: uploadError.message.toLowerCase().includes("bucket")
+            ? "Photo bucket is missing. In Supabase Storage, create a public bucket named dog-photos."
+            : `Photo upload failed: ${uploadError.message}`,
+        };
+      }
+
+      const { data: publicUrl } = supabase.storage.from(BUCKET).getPublicUrl(path);
+      photoUrl = publicUrl.publicUrl;
     }
-
-    const { data: publicUrl } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
     const { data: rpcData, error: rpcError } = await supabase.rpc(
       "register_contestant",
@@ -72,8 +79,11 @@ export async function registerDog(formData: FormData): Promise<ActionResult> {
         p_owner_name: parsed.data.ownerName,
         p_owner_email: parsed.data.ownerEmail,
         p_owner_phone: parsed.data.ownerPhone,
-        p_photo_url: publicUrl.publicUrl,
+        p_photo_url: photoUrl,
         p_costume_description: parsed.data.costumeDescription,
+        p_breed: parsed.data.breed ?? "",
+        p_inspiration: parsed.data.inspiration ?? "",
+        p_funny_fact: parsed.data.funnyFact ?? "",
       },
     );
 
@@ -81,6 +91,7 @@ export async function registerDog(formData: FormData): Promise<ActionResult> {
       const result = rpcData as { unique_id?: string; dog_name?: string };
       revalidatePath("/contest");
       revalidatePath("/admin/dogs");
+      revalidatePath("/admin/script");
       return {
         ok: true,
         uniqueId: result.unique_id,
@@ -103,8 +114,11 @@ export async function registerDog(formData: FormData): Promise<ActionResult> {
       owner_name: parsed.data.ownerName,
       owner_email: parsed.data.ownerEmail,
       owner_phone: parsed.data.ownerPhone,
-      photo_url: publicUrl.publicUrl,
+      photo_url: photoUrl,
       costume_description: parsed.data.costumeDescription,
+      breed: parsed.data.breed ?? "",
+      inspiration: parsed.data.inspiration ?? "",
+      funny_fact: parsed.data.funnyFact ?? "",
       round_number: roundNumber,
       display_order: displayOrder,
       is_finalist: false,
@@ -134,6 +148,7 @@ export async function registerDog(formData: FormData): Promise<ActionResult> {
 
     revalidatePath("/contest");
     revalidatePath("/admin/dogs");
+    revalidatePath("/admin/script");
     return {
       ok: true,
       uniqueId,
@@ -168,6 +183,9 @@ export async function updateDog(input: unknown): Promise<ActionResult> {
       owner_email: data.ownerEmail,
       owner_phone: data.ownerPhone,
       costume_description: data.costumeDescription,
+      breed: data.breed ?? "",
+      inspiration: data.inspiration ?? "",
+      funny_fact: data.funnyFact ?? "",
       ...(typeof isFinalist === "boolean" ? { is_finalist: isFinalist } : {}),
       updated_at: new Date().toISOString(),
     })
@@ -176,6 +194,7 @@ export async function updateDog(input: unknown): Promise<ActionResult> {
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/dogs");
+  revalidatePath("/admin/script");
   revalidatePath("/admin/finalists");
   revalidatePath("/vote");
   return { ok: true };
@@ -187,6 +206,7 @@ export async function deleteDog(id: string): Promise<ActionResult> {
   const { error } = await supabase.from("dogs").delete().eq("id", id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/dogs");
+  revalidatePath("/admin/script");
   revalidatePath("/contest");
   return { ok: true };
 }

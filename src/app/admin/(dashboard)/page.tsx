@@ -60,6 +60,33 @@ export default async function AdminDashboardPage() {
         votingOpen={settings?.voting_open ?? false}
         dogCount={dogCount ?? 0}
       />
+      <Card>
+        <CardHeader>
+          <CardTitle>Event-day walkthrough</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ol className="list-decimal space-y-2 pl-5 text-sm text-slate-700">
+            <li>
+              Share <strong>/register</strong> for signup and walk-ins. Each dog
+              gets DOG-001, DOG-002… and lands in a round of 10.
+            </li>
+            <li>
+              MC uses <strong>MC script</strong> to introduce dogs. Staff uses{" "}
+              <strong>Rounds</strong> to open Round 1, complete it, then open
+              Round 2. Finished rounds stay on Contestants.
+            </li>
+            <li>
+              After the last round, click <strong>Start voting</strong> and send
+              guests to <strong>/vote</strong>. One vote per prize, all five
+              prizes.
+            </li>
+            <li>
+              Only admins open <strong>Results</strong> for winners. Keep that
+              page off the projector until you are ready to announce.
+            </li>
+          </ol>
+        </CardContent>
+      </Card>
     </div>
   );
 }
