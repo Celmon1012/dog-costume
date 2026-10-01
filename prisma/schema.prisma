@@ -57,6 +57,7 @@ model Dog {
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
   votes              Vote[]
+  roundVotes         RoundVote[]
 
   @@index([roundNumber])
   @@index([isFinalist])
@@ -87,4 +88,17 @@ model Vote {
   @@unique([prizeCategoryId, voterEmail])
   @@index([dogId])
   @@map("votes")
+}
+
+model RoundVote {
+  id              String   @id @default(cuid())
+  dogId           String   @map("dog_id")
+  roundNumber     Int      @map("round_number")
+  voterIdentifier String   @map("voter_identifier")
+  createdAt       DateTime @default(now()) @map("created_at")
+  dog             Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+
+  @@unique([roundNumber, voterIdentifier])
+  @@index([dogId])
+  @@map("round_votes")
 }

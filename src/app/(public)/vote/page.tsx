@@ -23,8 +23,8 @@ export default async function VotePage() {
         .select(
           "id, unique_id, dog_name, photo_url, costume_description, round_number, display_order",
         )
-        .order("round_number", { ascending: true })
-        .order("display_order", { ascending: true }),
+        .eq("is_finalist", true)
+        .order("unique_id", { ascending: true }),
     ]);
 
   return (
@@ -42,7 +42,7 @@ export default async function VotePage() {
           <div className="mx-auto w-full max-w-xl text-white">
             <h1 className="text-3xl font-bold">Vote</h1>
             <p className="mt-1 text-sm text-white/90">
-              One dog per prize category. You can vote in all five awards.
+              Final prize voting — one dog per category, finalists only.
             </p>
           </div>
         </div>

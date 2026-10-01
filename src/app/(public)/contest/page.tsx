@@ -1,11 +1,13 @@
-import { DogCard } from "@/components/dogs/dog-card";
+import { RoundVoteGrid } from "@/components/contest/round-vote-grid";
 import { createClient } from "@/lib/supabase/server";
+import { getVoterId } from "@/lib/voter";
 import Image from "next/image";
 
-export const revalidate = 10;
+export const dynamic = "force-dynamic";
 
 export default async function ContestPage() {
   const supabase = await createClient();
+  const voterId = await getVoterId();
 
   const [{ data: rounds }, { data: allDogs }] = await Promise.all([
     supabase
@@ -21,6 +23,18 @@ export default async function ContestPage() {
       .order("round_number", { ascending: true })
       .order("display_order", { ascending: true }),
   ]);
+
+  const liveRoundNumber = (rounds ?? []).find((round) => round.status === "OPEN")
+    ?.round_number as number | undefined;
+
+  let votedDogId: string | null = null;
+  if (voterId && liveRoundNumber) {
+    const { data } = await supabase.rpc("get_round_vote", {
+      p_round: liveRoundNumber,
+      p_voter: voterId,
+    });
+    if (typeof data === "string" && data) votedDogId = data;
+  }
 
   const visibleRoundNumbers = new Set(
     (rounds ?? []).map((round) => round.round_number as number),
@@ -57,9 +71,9 @@ export default async function ContestPage() {
             <h1 className="text-3xl font-bold">Contestants</h1>
             <p className="mt-1 text-sm text-white/90">
               {liveRound
-                ? `Round ${liveRound.roundNumber} is on stage. Finished rounds stay visible.`
+                ? `Round ${liveRound.roundNumber} is on stage. Vote for your favorite in this round.`
                 : sections.length
-                  ? "Completed rounds are listed below. Voting opens after the last round."
+                  ? "Completed rounds stay visible. Prize voting is on the Vote page after finalists are picked."
                   : "No round is open yet. Check back when the emcee starts Round 1."}
             </p>
           </div>
@@ -88,20 +102,14 @@ export default async function ContestPage() {
                   No dogs in this round yet.
                 </p>
               ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {section.dogs.map((dog) => (
-                    <DogCard
-                      key={dog.id}
-                      uniqueId={dog.unique_id}
-                      dogName={dog.dog_name}
-                      costumeDescription={dog.costume_description}
-                      photoUrl={dog.photo_url}
-                      showRound
-                      roundNumber={dog.round_number}
-                      displayOrder={dog.display_order}
-                    />
-                  ))}
-                </div>
+                <RoundVoteGrid
+                  dogs={section.dogs}
+                  roundNumber={section.roundNumber}
+                  votingOpen={section.status === "OPEN"}
+                  votedDogId={
+                    section.status === "OPEN" ? votedDogId : null
+                  }
+                />
               )}
             </section>
           ))

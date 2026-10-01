@@ -43,8 +43,15 @@ export async function submitVotes(
 
   const voterEmail = parsed.data.voterEmail.trim().toLowerCase();
 
-  const { data: contestants } = await supabase.from("dogs").select("id");
+  const { data: contestants } = await supabase
+    .from("dogs")
+    .select("id")
+    .eq("is_finalist", true);
   const contestantSet = new Set((contestants ?? []).map((d) => d.id));
+
+  if (!contestantSet.size) {
+    return { ok: false, error: "Finalists have not been selected yet." };
+  }
 
   for (const vote of parsed.data.votes) {
     if (!contestantSet.has(vote.dogId)) {
@@ -74,4 +81,56 @@ export async function submitVotes(
 
   revalidatePath("/admin/results");
   return { ok: true, message: "Thanks! Your votes have been recorded." };
+}
+
+export async function submitRoundVote(
+  dogId: string,
+  roundNumber: number,
+): Promise<VoteActionResult> {
+  const supabase = await createClient();
+  const voterIdentifier = await getVoterId();
+  if (!voterIdentifier) {
+    return { ok: false, error: "Could not identify this device. Refresh and try again." };
+  }
+
+  const { data: dog } = await supabase
+    .from("dogs")
+    .select("id, round_number")
+    .eq("id", dogId)
+    .maybeSingle();
+
+  if (!dog || dog.round_number !== roundNumber) {
+    return { ok: false, error: "That dog is not in this round." };
+  }
+
+  const { data: round } = await supabase
+    .from("rounds")
+    .select("status")
+    .eq("round_number", roundNumber)
+    .maybeSingle();
+
+  if (round?.status !== "OPEN") {
+    return { ok: false, error: "Introduction voting is only open for the live round." };
+  }
+
+  const { error } = await supabase.from("round_votes").insert({
+    id: crypto.randomUUID(),
+    dog_id: dogId,
+    round_number: roundNumber,
+    voter_identifier: voterIdentifier,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      error:
+        error.message.includes("duplicate") || error.code === "23505"
+          ? "This device already voted in this round."
+          : "Could not save your round vote. Run supabase/round_votes.sql in the SQL editor if this is the first time.",
+    };
+  }
+
+  revalidatePath("/contest");
+  revalidatePath("/admin/finalists");
+  return { ok: true, message: "Vote recorded for this round." };
 }

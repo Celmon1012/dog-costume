@@ -8,7 +8,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import type { AdminDogRow } from "@/components/admin/dog-table";
 
-export function FinalistPicker({ dogs }: { dogs: AdminDogRow[] }) {
+export function FinalistPicker({
+  dogs,
+}: {
+  dogs: Array<AdminDogRow & { roundVoteCount?: number }>;
+}) {
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(dogs.filter((d) => d.isFinalist).map((d) => d.id)),
   );
@@ -58,6 +62,10 @@ export function FinalistPicker({ dogs }: { dogs: AdminDogRow[] }) {
                   {dog.uniqueId}
                 </p>
                 <p className="font-medium">{dog.dogName}</p>
+                <p className="text-xs text-slate-500">
+                  Round {dog.roundNumber} · {dog.roundVoteCount ?? 0} round vote
+                  {(dog.roundVoteCount ?? 0) === 1 ? "" : "s"}
+                </p>
               </div>
             </div>
           </Card>

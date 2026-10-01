@@ -104,3 +104,4 @@ DROP POLICY IF EXISTS "dog_photos_upload" ON storage.objects;
 CREATE POLICY "dog_photos_upload"
   ON storage.objects FOR INSERT TO anon, authenticated
   WITH CHECK (bucket_id = 'dog-photos');
+

@@ -122,13 +122,14 @@ export async function startAudienceVoting(): Promise<ActionResult> {
     }
   }
 
-  const { count: dogCount } = await supabase
+  const { count: finalistCount } = await supabase
     .from("dogs")
-    .select("*", { count: "exact", head: true });
-  if (!dogCount) {
+    .select("*", { count: "exact", head: true })
+    .eq("is_finalist", true);
+  if (!finalistCount) {
     return {
       ok: false,
-      error: "Register at least one dog before opening voting.",
+      error: "Pick finalists first (Admin → Finalists), then start prize voting.",
     };
   }
 

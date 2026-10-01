@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
     { data: activeRound },
     { data: settings },
   ] = await Promise.all([
-    supabase.from("dogs").select("id"),
+    supabase.from("dogs").select("id, is_finalist"),
     supabase.from("votes").select("id", { count: "exact", head: true }),
     supabase
       .from("rounds")
@@ -30,6 +30,7 @@ export default async function AdminDashboardPage() {
   ]);
 
   const dogCount = dogRows?.length ?? 0;
+  const finalistCount = dogRows?.filter((dog) => dog.is_finalist).length ?? 0;
 
   return (
     <div className="space-y-8">
@@ -45,6 +46,7 @@ export default async function AdminDashboardPage() {
             value: activeRound ? `Round ${activeRound.round_number}` : "None open",
           },
           { label: "Total votes", value: voteCount ?? 0 },
+          { label: "Finalists", value: finalistCount },
         ].map((stat) => (
           <Card key={stat.label}>
             <CardHeader className="pb-2">
@@ -59,6 +61,7 @@ export default async function AdminDashboardPage() {
       <StartVotingCard
         votingOpen={settings?.voting_open ?? false}
         dogCount={dogCount ?? 0}
+        finalistCount={finalistCount}
       />
       <Card>
         <CardHeader>
@@ -71,18 +74,17 @@ export default async function AdminDashboardPage() {
               gets DOG-001, DOG-002… and lands in a round of 10.
             </li>
             <li>
-              MC uses <strong>MC script</strong> to introduce dogs. Staff uses{" "}
-              <strong>Rounds</strong> to open Round 1, complete it, then open
-              Round 2. Finished rounds stay on Contestants.
+              MC uses <strong>MC script</strong>. Staff opens one round at a
+              time. Guests vote for one favorite on <strong>Contestants</strong>{" "}
+              during the live round.
             </li>
             <li>
-              After the last round, click <strong>Start voting</strong> and send
-              guests to <strong>/vote</strong>. One vote per prize, all five
-              prizes.
+              After rounds, open <strong>Finalists</strong>, pick dogs using
+              round vote counts, then <strong>Start prize voting</strong>.
             </li>
             <li>
-              Only admins open <strong>Results</strong> for winners. Keep that
-              page off the projector until you are ready to announce.
+              Guests use <strong>/vote</strong> for the five prizes (finalists
+              only). Only admins see <strong>Results</strong>.
             </li>
           </ol>
         </CardContent>

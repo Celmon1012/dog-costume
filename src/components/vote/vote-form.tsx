@@ -99,7 +99,8 @@ export function VoteForm({
           <CardTitle>Voting opens soon</CardTitle>
         </CardHeader>
         <CardContent className="text-slate-600">
-          The emcee will open voting after every round is on stage. Results stay hidden until then.
+          The emcee will open prize voting after finalists are chosen. Round
+          favorites are voted on Contestants.
         </CardContent>
       </Card>
     );
@@ -109,10 +110,10 @@ export function VoteForm({
     return (
       <Card className="mx-auto max-w-lg text-center">
         <CardHeader>
-          <CardTitle>No contestants yet</CardTitle>
+          <CardTitle>No finalists yet</CardTitle>
         </CardHeader>
         <CardContent className="text-slate-600">
-          Dogs will appear here after they are registered.
+          Staff will pick finalists from the round votes, then this page opens.
         </CardContent>
       </Card>
     );

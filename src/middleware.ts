@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   // Public pages skip Supabase auth — that extra round-trip made every click lag.
   if (!path.startsWith("/admin")) {
     const response = NextResponse.next({ request });
-    if (!existingVoter && (path === "/vote" || path.startsWith("/vote/"))) {
+    if (!existingVoter && (path === "/vote" || path.startsWith("/vote/") || path === "/contest" || path.startsWith("/contest/"))) {
       response.cookies.set(VOTER_COOKIE, voterId, voterCookieOptions);
     }
     return response;
@@ -80,5 +80,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/vote", "/vote/:path*"],
+  matcher: ["/admin/:path*", "/vote", "/vote/:path*", "/contest", "/contest/:path*"],
 };
