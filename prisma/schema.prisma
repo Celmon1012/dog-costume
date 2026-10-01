@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum RoundStatus {
+  CLOSED
+  OPEN
+  COMPLETED
+}
+
+model SiteSettings {
+  id         String   @id @default("default")
+  votingOpen Boolean  @default(false) @map("voting_open")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+model DogCounter {
+  id    String @id @default("global")
+  count Int    @default(0)
+
+  @@map("dog_counters")
+}
+
+model Round {
+  id          String      @id @default(cuid())
+  roundNumber Int         @unique @map("round_number")
+  status      RoundStatus @default(CLOSED)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@map("rounds")
+}
+
+model Dog {
+  id                 String   @id @default(cuid())
+  uniqueId           String   @unique @map("unique_id")
+  dogName            String   @map("dog_name")
+  ownerName          String   @map("owner_name")
+  ownerEmail         String   @map("owner_email")
+  ownerPhone         String   @map("owner_phone")
+  photoUrl           String   @map("photo_url")
+  costumeDescription String   @map("costume_description")
+  roundNumber        Int      @map("round_number")
+  displayOrder       Int      @map("display_order")
+  isFinalist         Boolean  @default(false) @map("is_finalist")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  votes              Vote[]
+
+  @@index([roundNumber])
+  @@index([isFinalist])
+  @@map("dogs")
+}
+
+model PrizeCategory {
+  id          String @id @default(cuid())
+  name        String
+  subcategory String
+  sortOrder   Int    @unique @map("sort_order")
+  votes       Vote[]
+
+  @@map("prize_categories")
+}
+
+model Vote {
+  id              String   @id @default(cuid())
+  dogId           String   @map("dog_id")
+  prizeCategoryId String   @map("prize_category_id")
+  voterIdentifier String   @map("voter_identifier")
+  createdAt       DateTime @default(now()) @map("created_at")
+  dog             Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  prizeCategory   PrizeCategory @relation(fields: [prizeCategoryId], references: [id], onDelete: Cascade)
+
+  @@unique([prizeCategoryId, voterIdentifier])
+  @@index([dogId])
+  @@map("votes")
+}

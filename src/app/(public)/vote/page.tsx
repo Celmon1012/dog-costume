@@ -1,0 +1,69 @@
+import Image from "next/image";
+import { VoteForm } from "@/components/vote/vote-form";
+import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+export default async function VotePage() {
+  const supabase = await createClient();
+
+  const [{ data: settings }, { data: categories }, { data: dogs }] =
+    await Promise.all([
+      supabase
+        .from("site_settings")
+        .select("voting_open")
+        .eq("id", "default")
+        .maybeSingle(),
+      supabase
+        .from("prize_categories")
+        .select("id, name, subcategory, sort_order")
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("dogs")
+        .select("id, unique_id, dog_name, photo_url, costume_description")
+        .eq("is_finalist", true)
+        .order("unique_id", { ascending: true }),
+    ]);
+
+  return (
+    <div className="bg-[#f6f1ea] pb-12">
+      <div className="relative h-40 w-full overflow-hidden sm:h-52">
+        <Image
+          src="/images/vote-dog.jpg"
+          alt="Vote for your favorite costume"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/35" />
+        <div className="absolute inset-0 flex items-end px-4 py-6">
+          <div className="mx-auto w-full max-w-xl text-white">
+            <h1 className="text-3xl font-bold">Vote</h1>
+            <p className="mt-1 text-sm text-white/90">
+              Pick one dog per prize category when voting is open.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto max-w-xl px-4 py-8">
+        <VoteForm
+          categories={(categories ?? []).map((category) => ({
+            id: category.id,
+            name: category.name,
+            subcategory: category.subcategory,
+            sortOrder: category.sort_order,
+          }))}
+          dogs={(dogs ?? []).map((dog) => ({
+            id: dog.id,
+            uniqueId: dog.unique_id,
+            dogName: dog.dog_name,
+            photoUrl: dog.photo_url,
+            costumeDescription: dog.costume_description,
+          }))}
+          votingOpen={settings?.voting_open ?? false}
+          existingCategoryIds={[]}
+        />
+      </div>
+    </div>
+  );
+}
