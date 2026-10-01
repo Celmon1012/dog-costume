@@ -87,3 +87,8 @@ Dogs 1–10 → Round 1. Dog 15 → `DOG-015`, round 2, display order 5.
 
 `roundNumber = Math.floor((sequence - 1) / 10) + 1`  
 `displayOrder = ((sequence - 1) % 10) + 1`
+
+## Vercel
+
+Import `Celmon1012/dog-costume` as a Next.js project with root `./`. After the project exists, open it in the Vercel dashboard and click **Deploy** on branch `main` if no build starts automatically.
+
