@@ -119,9 +119,9 @@ export default function HomePage() {
             href="/register"
             className="group block overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-orange-100"
           >
-            <div className="relative h-56 sm:h-72">
+            <div className="relative h-48 sm:h-56">
               <Image
-                src="/images/signup-dog.webp"
+                src="/images/signup-dog.jpg"
                 alt="Sign up your dog"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"

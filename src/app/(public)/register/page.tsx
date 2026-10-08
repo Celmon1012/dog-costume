@@ -6,7 +6,7 @@ export default function RegisterPage() {
     <div className="bg-[#f6f1ea] pb-12">
       <div className="relative h-48 w-full overflow-hidden sm:h-64">
         <Image
-          src="/images/signup-dog.webp"
+          src="/images/signup-dog.jpg"
           alt="Dog in costume"
           fill
           className="object-cover"
