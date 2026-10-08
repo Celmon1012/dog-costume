@@ -50,8 +50,8 @@ export function WinnerPicker({ categories }: { categories: CategoryResult[] }) {
   return (
     <div className="space-y-6">
       <p className="rounded-lg bg-orange-50 px-4 py-3 text-sm text-orange-950">
-        Ranked by audience votes. Pick one winner per prize. When all five are
-        chosen, guests see the congratulations page.
+        Ranked by audience votes across all contestants. Pick one winner per
+        prize. When all five are chosen, guests see the congratulations page.
         <span className="mt-1 block font-semibold">
           {chosenCount} of {categories.length} winners chosen
           {chosenCount === categories.length && categories.length > 0
@@ -70,7 +70,7 @@ export function WinnerPicker({ categories }: { categories: CategoryResult[] }) {
             <p className="text-sm text-slate-500">{category.totalVotes} total votes</p>
           </div>
           {category.tallies.length === 0 ? (
-            <p className="text-sm text-slate-400">No finalists yet.</p>
+            <p className="text-sm text-slate-400">No contestants yet.</p>
           ) : (
             <div className="space-y-2">
               {category.tallies.map((row, index) => {

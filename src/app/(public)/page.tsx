@@ -24,18 +24,21 @@ const awards = [
 const steps = [
   {
     icon: ClipboardList,
-    title: "Sign up",
-    blurb: "Walk-ins welcome. You get a number like DOG-001 and a round of 10.",
+    title: "1. Sign up your dog",
+    blurb:
+      "Walk-ins are welcome. Fill in your dog’s name, costume, and an optional photo. You will get a number like DOG-001, and your dog is placed in a small group of ten.",
   },
   {
     icon: Users,
-    title: "On stage",
-    blurb: "The MC introduces each round. Vote for your favorite on Contestants.",
+    title: "2. Watch the introductions",
+    blurb:
+      "The MC brings dogs out in those small groups. Browse photos anytime on Contestants so you can remember who you loved. There is no voting during the introductions.",
   },
   {
     icon: Vote,
-    title: "Final prizes",
-    blurb: "After finalists are picked, vote once in each of the five awards.",
+    title: "3. Vote after the last group",
+    blurb:
+      "When every group has been on stage, voting opens. Pick one dog in each of the five prize categories. One vote per prize, per phone. Winners are announced at the end.",
   },
 ];
 
@@ -44,7 +47,7 @@ export default function HomePage() {
     <div className="bg-[#f6f1ea] pb-20">
       <div className="relative h-72 w-full overflow-hidden sm:h-[28rem]">
         <Image
-          src="/images/hero-dogs.jpg"
+          src="/images/hero-dogs.webp"
           alt="Dogs in costumes at the contest"
           fill
           priority
@@ -56,14 +59,16 @@ export default function HomePage() {
             <PawPrint className="h-9 w-9 text-orange-500 sm:h-10 sm:w-10" />
           </div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-200">
-            Live event · rounds of 10
+            Live event · groups of 10
           </p>
           <h1 className="mt-2 max-w-4xl text-4xl font-bold drop-shadow sm:text-6xl">
             Dog Costume Contest
           </h1>
           <p className="mt-3 max-w-2xl text-base text-white/90 sm:text-lg">
-            Sign up once. The MC reads your story. The crowd votes. Prizes at
-            the end.
+            Sign up your dog, then enjoy the introductions. Dogs come out in
+            small groups of ten while the MC tells each story. Photos stay on
+            this site so you can look back. After the last group, voting opens
+            for five prizes — one winner in each category.
           </p>
           <div className="mt-8 flex w-full max-w-lg flex-col gap-3 sm:flex-row">
             <Button asChild className="h-12 flex-1 rounded-full text-base">
@@ -81,7 +86,20 @@ export default function HomePage() {
       </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <section className="mt-10 grid gap-4 sm:grid-cols-3">
+        <section className="mt-10 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-orange-100 sm:p-8">
+          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+            How today works
+          </h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed text-slate-600">
+            This page is only the costume contest. Tickets stay on
+            montclair-dog.com. Use your phone here to sign up, look at the dogs,
+            and vote when the emcee says voting is open. You do not vote after
+            every group — wait until all the dogs have been introduced, then
+            choose one winner in each prize.
+          </p>
+        </section>
+
+        <section className="mt-8 grid gap-4 sm:grid-cols-3">
           {steps.map(({ icon: Icon, title, blurb }) => (
             <div
               key={title}
@@ -96,14 +114,14 @@ export default function HomePage() {
           ))}
         </section>
 
-        <section className="mt-12 grid gap-6 lg:grid-cols-2">
+        <section className="mt-12">
           <Link
             href="/register"
-            className="group overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-orange-100"
+            className="group block overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-orange-100"
           >
-            <div className="relative h-56 sm:h-64">
+            <div className="relative h-56 sm:h-72">
               <Image
-                src="/images/signup-dog.jpg"
+                src="/images/signup-dog.webp"
                 alt="Sign up your dog"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -112,31 +130,10 @@ export default function HomePage() {
               <div className="absolute bottom-0 p-6 text-white">
                 <p className="text-sm font-medium text-orange-200">Walk-ins welcome</p>
                 <h3 className="text-2xl font-bold">Sign up your dog</h3>
-                <p className="mt-1 text-sm text-white/85">
+                <p className="mt-1 max-w-xl text-sm text-white/85">
                   Name, costume, optional photo — get your contestant number
-                  instantly.
-                </p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href="/vote"
-            className="group overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-orange-100"
-          >
-            <div className="relative h-56 sm:h-64">
-              <Image
-                src="/images/vote-dog.jpg"
-                alt="Vote for costumes"
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              <div className="absolute bottom-0 p-6 text-white">
-                <p className="text-sm font-medium text-orange-200">Phones ready</p>
-                <h3 className="text-2xl font-bold">Cast your vote</h3>
-                <p className="mt-1 text-sm text-white/85">
-                  Round favorites on Contestants. Five prize categories on Vote
-                  after finalists.
+                  instantly. After the last group is introduced, use Vote to
+                  pick one dog in each prize.
                 </p>
               </div>
             </div>
@@ -147,7 +144,8 @@ export default function HomePage() {
           <div className="mb-6 text-center">
             <h2 className="text-3xl font-bold text-slate-900">Prize categories</h2>
             <p className="mt-2 text-slate-600">
-              One vote per prize. You can vote in all five.
+              One vote per prize. You can vote in all five. One winner is chosen
+              in each category at the end.
             </p>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { DogPhoto } from "@/components/dogs/dog-photo";
-import { deleteDog, toggleFinalist, updateDog } from "@/actions/dogs";
+import { compressImage } from "@/lib/compress-image";
+import { deleteDog, updateDog, updateDogPhoto } from "@/actions/dogs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +30,9 @@ export type { AdminDogRow };
 
 export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
   const [editing, setEditing] = useState<AdminDogRow | null>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this dog?")) return;
@@ -42,7 +44,20 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
   async function handleSave() {
     if (!editing) return;
     setBusy(editing.id);
-    await updateDog(editing);
+    setPhotoError(null);
+    const result = await updateDog(editing);
+    if (result.ok && photo) {
+      const fd = new FormData();
+      fd.append("id", editing.id);
+      fd.append("photo", await compressImage(photo));
+      const photoResult = await updateDogPhoto(fd);
+      if (!photoResult.ok) {
+        setPhotoError(photoResult.error);
+        setBusy(null);
+        return;
+      }
+    }
+    setPhoto(null);
     setEditing(null);
     setBusy(null);
   }
@@ -59,7 +74,6 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
               <TableHead>Round</TableHead>
               <TableHead>Order</TableHead>
               <TableHead>Costume</TableHead>
-              <TableHead>Finalist</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -84,21 +98,16 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
                 <TableCell className="max-w-[200px] truncate text-slate-600">
                   {dog.costumeDescription}
                 </TableCell>
-                <TableCell>
-                  <Checkbox
-                    checked={dog.isFinalist}
-                    disabled={busy === dog.id}
-                    onCheckedChange={(checked) =>
-                      toggleFinalist(dog.id, checked === true)
-                    }
-                  />
-                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => setEditing(dog)}
+                      onClick={() => {
+                        setPhoto(null);
+                        setPhotoError(null);
+                        setEditing(dog);
+                      }}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -118,13 +127,45 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
         </Table>
       </div>
 
-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+      <Dialog
+        open={!!editing}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditing(null);
+            setPhoto(null);
+            setPhotoError(null);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit {editing?.uniqueId}</DialogTitle>
           </DialogHeader>
           {editing ? (
             <div className="space-y-3">
+              <div>
+                <Label>Photo</Label>
+                <div className="mt-1 flex items-center gap-3">
+                  <div className="relative h-16 w-16 overflow-hidden rounded-md bg-orange-50">
+                    <DogPhoto
+                      src={
+                        photo ? URL.createObjectURL(photo) : editing.photoUrl
+                      }
+                      alt={editing.dogName}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  </div>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-slate-500">
+                  Optional. Your team can add a photo if the owner skipped it
+                  at signup.
+                </p>
+              </div>
               <div>
                 <Label>Dog name</Label>
                 <Input
@@ -200,6 +241,9 @@ export function DogTable({ dogs }: { dogs: AdminDogRow[] }) {
                   }
                 />
               </div>
+              {photoError ? (
+                <p className="text-sm text-red-600">{photoError}</p>
+              ) : null}
               <Button onClick={handleSave} loading={busy === editing.id}>
                 Save changes
               </Button>

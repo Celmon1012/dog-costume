@@ -1,19 +1,16 @@
-import { RoundVoteGrid } from "@/components/contest/round-vote-grid";
+import { DogCard } from "@/components/dogs/dog-card";
 import { createClient } from "@/lib/supabase/server";
-import { getVoterId } from "@/lib/voter";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
 export default async function ContestPage() {
   const supabase = await createClient();
-  const voterId = await getVoterId();
 
   const [{ data: rounds }, { data: allDogs }] = await Promise.all([
     supabase
       .from("rounds")
       .select("round_number, status")
-      .in("status", ["OPEN", "COMPLETED"])
       .order("round_number", { ascending: true }),
     supabase
       .from("dogs")
@@ -24,42 +21,39 @@ export default async function ContestPage() {
       .order("display_order", { ascending: true }),
   ]);
 
-  const liveRoundNumber = (rounds ?? []).find((round) => round.status === "OPEN")
-    ?.round_number as number | undefined;
-
-  let votedDogId: string | null = null;
-  if (voterId && liveRoundNumber) {
-    const { data } = await supabase.rpc("get_round_vote", {
-      p_round: liveRoundNumber,
-      p_voter: voterId,
-    });
-    if (typeof data === "string" && data) votedDogId = data;
-  }
-
-  const visibleRoundNumbers = new Set(
-    (rounds ?? []).map((round) => round.round_number as number),
-  );
   const dogsByRound = new Map<number, NonNullable<typeof allDogs>>();
   for (const dog of allDogs ?? []) {
-    if (!visibleRoundNumbers.has(dog.round_number)) continue;
     const list = dogsByRound.get(dog.round_number) ?? [];
     list.push(dog);
     dogsByRound.set(dog.round_number, list);
   }
 
-  const sections = (rounds ?? []).map((round) => ({
-    roundNumber: round.round_number as number,
-    status: round.status as string,
-    dogs: dogsByRound.get(round.round_number as number) ?? [],
-  }));
+  const roundNumbers = [
+    ...new Set([
+      ...(rounds ?? []).map((round) => round.round_number as number),
+      ...dogsByRound.keys(),
+    ]),
+  ].sort((a, b) => a - b);
 
-  const liveRound = sections.find((section) => section.status === "OPEN");
+  const sections = roundNumbers.map((roundNumber) => {
+    const row = (rounds ?? []).find((round) => round.round_number === roundNumber);
+    return {
+      roundNumber,
+      status: (row?.status as string) ?? "CLOSED",
+      dogs: dogsByRound.get(roundNumber) ?? [],
+    };
+  });
+
+  const visibleSections = sections.filter(
+    (section) => section.status === "OPEN" || section.status === "COMPLETED",
+  );
+  const liveRound = visibleSections.find((section) => section.status === "OPEN");
 
   return (
     <div className="bg-[#f6f1ea] pb-12">
       <div className="relative h-48 w-full overflow-hidden sm:h-64">
         <Image
-          src="/images/hero-dogs.jpg"
+          src="/images/contest-dogs.webp"
           alt="Costume contest dogs"
           fill
           className="object-cover"
@@ -69,28 +63,31 @@ export default async function ContestPage() {
         <div className="absolute inset-0 flex items-end px-4 py-6 sm:px-6">
           <div className="mx-auto w-full max-w-6xl text-white">
             <h1 className="text-3xl font-bold">Contestants</h1>
-            <p className="mt-1 text-sm text-white/90">
+            <p className="mt-1 max-w-2xl text-sm text-white/90">
               {liveRound
-                ? `Round ${liveRound.roundNumber} is on stage. Vote for your favorite in this round.`
-                : sections.length
-                  ? "Completed rounds stay visible. Prize voting is on the Vote page after finalists are picked."
-                  : "No round is open yet. Check back when the emcee starts Round 1."}
+                ? `Round ${liveRound.roundNumber} is on stage now. Photos stay here so you can look back — voting opens after the last group.`
+                : "Browse photos from each group. There is no voting on this page. Prize voting opens on Vote after every group has been introduced."}
             </p>
           </div>
         </div>
       </div>
       <div className="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
-        {!sections.length ? (
+        {!visibleSections.length ? (
           <p className="rounded-lg border border-dashed border-orange-200 bg-white/70 p-8 text-center text-slate-600">
-            Contestants appear after the emcee opens a round.
+            Photos appear here after the emcee opens each round. Check back when
+            the first group is on stage.
           </p>
         ) : (
-          sections.map((section) => (
+          visibleSections.map((section) => (
             <section key={section.roundNumber} className="space-y-4">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">
                   Round {section.roundNumber}
-                  {section.status === "OPEN" ? " · live" : " · completed"}
+                  {section.status === "OPEN"
+                    ? " · on stage"
+                    : section.status === "COMPLETED"
+                      ? " · introduced"
+                      : ""}
                 </h2>
                 <p className="text-sm text-slate-600">
                   {section.dogs.length}{" "}
@@ -102,14 +99,20 @@ export default async function ContestPage() {
                   No dogs in this round yet.
                 </p>
               ) : (
-                <RoundVoteGrid
-                  dogs={section.dogs}
-                  roundNumber={section.roundNumber}
-                  votingOpen={section.status === "OPEN"}
-                  votedDogId={
-                    section.status === "OPEN" ? votedDogId : null
-                  }
-                />
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {section.dogs.map((dog) => (
+                    <DogCard
+                      key={dog.id}
+                      uniqueId={dog.unique_id}
+                      dogName={dog.dog_name}
+                      costumeDescription={dog.costume_description}
+                      photoUrl={dog.photo_url}
+                      showRound
+                      roundNumber={dog.round_number}
+                      displayOrder={dog.display_order}
+                    />
+                  ))}
+                </div>
               )}
             </section>
           ))

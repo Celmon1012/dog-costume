@@ -24,7 +24,6 @@ export default async function VotePage() {
         .select(
           "id, unique_id, dog_name, photo_url, costume_description, round_number, display_order",
         )
-        .eq("is_finalist", true)
         .order("unique_id", { ascending: true }),
     ]);
 
@@ -32,8 +31,8 @@ export default async function VotePage() {
     <div className="bg-[#f6f1ea] pb-12">
       <div className="relative h-48 w-full overflow-hidden sm:h-64">
         <Image
-          src="/images/vote-dog.jpg"
-          alt="Vote for your favorite costume"
+          src="/images/vote-dog.webp"
+          alt="Vote for costume prizes"
           fill
           className="object-cover"
           priority
@@ -43,12 +42,12 @@ export default async function VotePage() {
           <div className="mx-auto w-full max-w-6xl text-white">
             <h1 className="text-3xl font-bold">Vote</h1>
             <p className="mt-1 text-sm text-white/90">
-              Final prize voting — one dog per category, finalists only.
+              One round of voting: pick one dog in each of the five prizes.
             </p>
           </div>
         </div>
       </div>
-      <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
+      <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
         <VoteForm
           categories={(categories ?? []).map((category) => ({
             id: category.id,

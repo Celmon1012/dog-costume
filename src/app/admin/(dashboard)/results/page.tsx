@@ -15,13 +15,14 @@ export default async function AdminResultsPage() {
       supabase.from("votes").select("dog_id, prize_category_id"),
       supabase
         .from("dogs")
-        .select("id, unique_id, dog_name, photo_url, costume_description, is_finalist")
-        .eq("is_finalist", true)
+        .select("id, unique_id, dog_name, photo_url, costume_description")
         .order("unique_id", { ascending: true }),
     ]);
 
+  const contestants = dogs ?? [];
+
   const results = (categories ?? []).map((category) => {
-    const tallies = (dogs ?? [])
+    const tallies = contestants
       .map((dog) => {
         const voteCount = (votes ?? []).filter(
           (vote) =>
@@ -52,11 +53,17 @@ export default async function AdminResultsPage() {
       <div>
         <h1 className="text-3xl font-bold">Results</h1>
         <p className="text-slate-600">
-          Finalists ranked by prize votes. Choose the winner of each category —
-          the guest congratulations page goes live after all five are set.
+          All contestants ranked by prize votes. Choose one winner per category
+          — the guest congratulations page goes live after all five are set.
         </p>
       </div>
-      <WinnerPicker categories={results} />
+      {contestants.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-orange-200 bg-white p-6 text-sm text-slate-600">
+          No contestants yet. Dogs appear here after they sign up.
+        </p>
+      ) : (
+        <WinnerPicker categories={results} />
+      )}
     </div>
   );
 }

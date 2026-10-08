@@ -10,11 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export function StartVotingCard({
   votingOpen,
   dogCount,
-  finalistCount,
 }: {
   votingOpen: boolean;
   dogCount: number;
-  finalistCount: number;
+  finalistCount?: number;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,27 +53,23 @@ export function StartVotingCard({
       <CardContent className="space-y-4">
         <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-600">
           <li>
-            Introduce rounds on Contestants ({dogCount} dogs). Guests vote for
-            one favorite per live round.
+            Introduce dogs in groups of 10 on stage ({dogCount} signed up).
+            Guests browse photos on Contestants — no voting yet.
           </li>
           <li>
-            Pick finalists from those counts{" "}
-            <Link href="/admin/finalists" className="text-orange-700 underline">
-              Finalists
-            </Link>{" "}
-            ({finalistCount} selected).
+            After the last group, tap Start prize voting. Guests use /vote for
+            all five awards, choosing from every contestant.
           </li>
-          <li>Start prize voting. Guests use /vote for the five awards.</li>
           <li>
             On{" "}
             <Link href="/admin/results" className="text-orange-700 underline">
               Results
             </Link>
-            , pick a winner per category. Guests then see /winners.
+            , pick one winner per category. Guests then see /winners.
           </li>
         </ol>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" onClick={start} loading={busy} disabled={busy || finalistCount === 0}>
+          <Button type="button" onClick={start} loading={busy} disabled={busy || dogCount === 0}>
             {busy ? "Starting..." : "Start prize voting"}
           </Button>
           <Button type="button" variant="outline" onClick={stop} loading={busy} disabled={busy}>

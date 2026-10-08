@@ -44,51 +44,21 @@ export function VoteForm({
 
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [voterEmail, setVoterEmail] = useState("");
-  const [step, setStep] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const current = sortedCategories[step];
-  if (!current) {
+  if (!sortedCategories.length) {
     return (
       <Card className="mx-auto max-w-lg text-center">
         <CardHeader>
           <CardTitle>Awards not configured</CardTitle>
         </CardHeader>
         <CardContent className="text-slate-600">
-          Prize categories have not been seeded yet. Ask an admin to run the
-          database seed.
+          Prize categories have not been set up yet.
         </CardContent>
       </Card>
     );
-  }
-
-  const alreadyVoted = existingCategoryIds.includes(current.id);
-
-  function selectDog(dogId: string) {
-    if (!current || alreadyVoted) return;
-    setSelections((prev) => ({ ...prev, [current.id]: dogId }));
-  }
-
-  async function handleSubmit() {
-    setSubmitting(true);
-    setError(null);
-    setMessage(null);
-    const votes = sortedCategories
-      .filter((cat) => !existingCategoryIds.includes(cat.id))
-      .map((cat) => ({
-        prizeCategoryId: cat.id,
-        dogId: selections[cat.id],
-      }))
-      .filter((v) => v.dogId);
-    const result = await submitVotes({ votes, voterEmail });
-    setSubmitting(false);
-    if (result.ok) {
-      setMessage(result.message);
-    } else {
-      setError(result.error);
-    }
   }
 
   if (!votingOpen) {
@@ -98,8 +68,8 @@ export function VoteForm({
           <CardTitle>Voting opens soon</CardTitle>
         </CardHeader>
         <CardContent className="text-slate-600">
-          The emcee will open prize voting after finalists are chosen. Round
-          favorites are voted on Contestants.
+          Voting opens after the last group has been introduced. Until then,
+          browse photos on Contestants.
         </CardContent>
       </Card>
     );
@@ -109,10 +79,10 @@ export function VoteForm({
     return (
       <Card className="mx-auto max-w-lg text-center">
         <CardHeader>
-          <CardTitle>No finalists yet</CardTitle>
+          <CardTitle>No contestants yet</CardTitle>
         </CardHeader>
         <CardContent className="text-slate-600">
-          Staff will pick finalists from the round votes, then this page opens.
+          Dogs will appear here after they sign up.
         </CardContent>
       </Card>
     );
@@ -129,8 +99,8 @@ export function VoteForm({
           <CardTitle className="text-emerald-800">You already voted</CardTitle>
         </CardHeader>
         <CardContent className="text-emerald-700">
-          This device has submitted a vote in every category. Results stay
-          hidden until the emcee announces winners.
+          This device has submitted a vote in every prize. Results stay hidden
+          until the emcee announces winners.
         </CardContent>
       </Card>
     );
@@ -147,59 +117,93 @@ export function VoteForm({
     );
   }
 
+  const missing = sortedCategories.filter(
+    (category) =>
+      !existingCategoryIds.includes(category.id) && !selections[category.id],
+  );
+
+  async function handleSubmit() {
+    setSubmitting(true);
+    setError(null);
+    setMessage(null);
+    const votes = sortedCategories
+      .filter((cat) => !existingCategoryIds.includes(cat.id))
+      .map((cat) => ({
+        prizeCategoryId: cat.id,
+        dogId: selections[cat.id],
+      }))
+      .filter((vote) => vote.dogId);
+    const result = await submitVotes({ votes, voterEmail });
+    setSubmitting(false);
+    if (result.ok) {
+      setMessage(result.message);
+    } else {
+      setError(result.error);
+    }
+  }
+
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-4">
-      <div className="flex items-center justify-between text-sm text-slate-600">
-        <span>
-          Category {step + 1} of {sortedCategories.length}
-        </span>
-        <span className="font-medium text-orange-800">{current.subcategory}</span>
-      </div>
-      <p className="text-xs text-slate-500">{current.name}</p>
-      {alreadyVoted ? (
-        <p className="rounded-md bg-violet-50 px-3 py-2 text-sm text-violet-800">
-          You already voted in this category on this device.
-        </p>
-      ) : null}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {dogs.map((dog) => {
-          const selected = selections[current.id] === dog.id;
-          return (
-            <button
-              key={dog.id}
-              type="button"
-              disabled={alreadyVoted}
-              onClick={() => selectDog(dog.id)}
-              className={cn(
-                "overflow-hidden rounded-xl border-2 text-left transition-all",
-                selected
-                  ? "border-orange-600 ring-2 ring-orange-200"
-                  : "border-transparent bg-white shadow-sm hover:border-orange-200",
-                alreadyVoted && "opacity-60",
-              )}
-            >
-              <div className="relative aspect-square w-full bg-orange-50">
-                <DogPhoto
-                  src={dog.photoUrl}
-                  alt={dog.dogName}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              </div>
-              <div className="space-y-0.5 p-2">
-                <p className="text-xs font-semibold text-orange-700">
-                  {dog.uniqueId}
+    <div className="mx-auto w-full max-w-5xl space-y-8">
+      <p className="text-center text-slate-600">
+        One vote per prize. Pick one dog in each of the five categories, then
+        submit once.
+      </p>
+      {sortedCategories.map((category) => {
+        const locked = existingCategoryIds.includes(category.id);
+        return (
+          <section key={category.id} className="space-y-3">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">{category.name}</h2>
+              <p className="text-sm text-slate-600">{category.subcategory}</p>
+              {locked ? (
+                <p className="mt-1 text-sm text-violet-800">
+                  You already voted in this prize on this device.
                 </p>
-                <p className="text-sm font-medium">{dog.dogName}</p>
-                <p className="line-clamp-2 text-xs text-slate-500">
-                  {dog.costumeDescription}
-                </p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      <div>
+              ) : null}
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {dogs.map((dog) => {
+                const selected = selections[category.id] === dog.id;
+                return (
+                  <button
+                    key={`${category.id}-${dog.id}`}
+                    type="button"
+                    disabled={locked}
+                    onClick={() =>
+                      setSelections((prev) => ({ ...prev, [category.id]: dog.id }))
+                    }
+                    className={cn(
+                      "overflow-hidden rounded-xl border-2 text-left transition-all",
+                      selected
+                        ? "border-orange-600 ring-2 ring-orange-200"
+                        : "border-transparent bg-white shadow-sm hover:border-orange-200",
+                      locked && "opacity-60",
+                    )}
+                  >
+                    <div className="relative aspect-square w-full bg-orange-50">
+                      <DogPhoto
+                        src={dog.photoUrl}
+                        alt={dog.dogName}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="space-y-0.5 p-2">
+                      <p className="text-xs font-semibold text-orange-700">
+                        {dog.uniqueId}
+                      </p>
+                      <p className="text-sm font-medium">{dog.dogName}</p>
+                      <p className="line-clamp-2 text-xs text-slate-500">
+                        {dog.costumeDescription}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
+      <div className="sticky bottom-0 rounded-xl border bg-white/95 p-4 shadow-lg backdrop-blur">
         <Label htmlFor="voter-email">Your email</Label>
         <Input
           id="voter-email"
@@ -207,45 +211,24 @@ export function VoteForm({
           required
           value={voterEmail}
           onChange={(event) => setVoterEmail(event.target.value)}
-          placeholder="Used once per prize category"
+          placeholder="Used once per prize"
           className="mt-1"
         />
-      </div>
-      <div className="flex gap-2">
+        {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
         <Button
           type="button"
-          variant="outline"
-          disabled={step === 0}
-          onClick={() => setStep((s) => s - 1)}
+          className="mt-3 w-full"
+          loading={submitting}
+          disabled={submitting || !voterEmail.trim() || missing.length > 0}
+          onClick={handleSubmit}
         >
-          Back
+          {submitting ? "Submitting..." : "Submit votes"}
         </Button>
-        {step < sortedCategories.length - 1 ? (
-          <Button
-            type="button"
-            className="flex-1"
-            disabled={!selections[current.id] && !alreadyVoted}
-            onClick={() => setStep((s) => s + 1)}
-          >
-            Next category
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            className="flex-1"
-            loading={submitting}
-            disabled={
-              submitting ||
-              !voterEmail.trim() ||
-              sortedCategories
-                .filter((c) => !existingCategoryIds.includes(c.id))
-                .some((c) => !selections[c.id])
-            }
-            onClick={handleSubmit}
-          >
-            {submitting ? "Submitting..." : "Submit all votes"}
-          </Button>
-        )}
+        {missing.length > 0 ? (
+          <p className="mt-2 text-center text-xs text-slate-500">
+            Pick one dog in every prize to submit.
+          </p>
+        ) : null}
       </div>
     </div>
   );

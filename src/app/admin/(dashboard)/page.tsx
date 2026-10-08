@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
     { data: activeRound },
     { data: settings },
   ] = await Promise.all([
-    supabase.from("dogs").select("id, is_finalist"),
+    supabase.from("dogs").select("id"),
     supabase.from("votes").select("id", { count: "exact", head: true }),
     supabase
       .from("rounds")
@@ -30,7 +30,6 @@ export default async function AdminDashboardPage() {
   ]);
 
   const dogCount = dogRows?.length ?? 0;
-  const finalistCount = dogRows?.filter((dog) => dog.is_finalist).length ?? 0;
 
   return (
     <div className="space-y-8">
@@ -38,15 +37,14 @@ export default async function AdminDashboardPage() {
         <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
         <p className="text-slate-600">Event-day control center</p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         {[
           { label: "Total dogs", value: dogCount ?? 0 },
           {
             label: "Current round",
             value: activeRound ? `Round ${activeRound.round_number}` : "None open",
           },
-          { label: "Total votes", value: voteCount ?? 0 },
-          { label: "Finalists", value: finalistCount },
+          { label: "Prize votes", value: voteCount ?? 0 },
         ].map((stat) => (
           <Card key={stat.label}>
             <CardHeader className="pb-2">
@@ -61,7 +59,6 @@ export default async function AdminDashboardPage() {
       <StartVotingCard
         votingOpen={settings?.voting_open ?? false}
         dogCount={dogCount ?? 0}
-        finalistCount={finalistCount}
       />
       <Card>
         <CardHeader>
@@ -71,21 +68,21 @@ export default async function AdminDashboardPage() {
           <ol className="list-decimal space-y-2 pl-5 text-sm text-slate-700">
             <li>
               Share <strong>/register</strong> for signup and walk-ins. Each dog
-              gets DOG-001, DOG-002… and lands in a round of 10.
+              gets DOG-001, DOG-002… and lands in a group of 10.
             </li>
             <li>
               MC uses <strong>MC script</strong>. Staff opens one round at a
-              time. Guests vote for one favorite on <strong>Contestants</strong>{" "}
-              during the live round.
+              time. When a round is open or completed, those dogs appear on{" "}
+              <strong>Contestants</strong> for the crowd to look back at. No
+              voting during introductions.
             </li>
             <li>
-              After rounds, open <strong>Finalists</strong>, pick dogs using
-              round vote counts, then <strong>Start prize voting</strong>.
+              After the last group, <strong>Start prize voting</strong>. Guests
+              use <strong>/vote</strong> for the five prizes.
             </li>
             <li>
-              Guests use <strong>/vote</strong> for the five prizes. On{" "}
-              <strong>Results</strong>, rank by votes and choose each winner.
-              After all five are set, guests see <strong>/winners</strong>.
+              On <strong>Results</strong>, choose one winner per category. After
+              all five are set, guests see <strong>/winners</strong>.
             </li>
           </ol>
         </CardContent>

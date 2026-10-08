@@ -43,14 +43,11 @@ export async function submitVotes(
 
   const voterEmail = parsed.data.voterEmail.trim().toLowerCase();
 
-  const { data: contestants } = await supabase
-    .from("dogs")
-    .select("id")
-    .eq("is_finalist", true);
+  const { data: contestants } = await supabase.from("dogs").select("id");
   const contestantSet = new Set((contestants ?? []).map((d) => d.id));
 
   if (!contestantSet.size) {
-    return { ok: false, error: "Finalists have not been selected yet." };
+    return { ok: false, error: "No contestants have signed up yet." };
   }
 
   for (const vote of parsed.data.votes) {

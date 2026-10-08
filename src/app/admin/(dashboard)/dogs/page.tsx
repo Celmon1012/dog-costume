@@ -18,7 +18,10 @@ export default async function AdminDogsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dog management</h1>
-        <p className="text-slate-600">Edit walk-ins or fix signup details.</p>
+        <p className="text-slate-600">
+          Edit walk-ins, fix signup details, and add a photo if the owner skipped
+          it.
+        </p>
       </div>
       <DogTable dogs={dogs} />
     </div>

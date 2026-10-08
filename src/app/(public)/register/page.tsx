@@ -6,7 +6,7 @@ export default function RegisterPage() {
     <div className="bg-[#f6f1ea] pb-12">
       <div className="relative h-48 w-full overflow-hidden sm:h-64">
         <Image
-          src="/images/signup-dog.jpg"
+          src="/images/signup-dog.webp"
           alt="Dog in costume"
           fill
           className="object-cover"
@@ -32,10 +32,11 @@ export default function RegisterPage() {
             </li>
             <li className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100">
               Dogs are grouped automatically in rounds of 10, first come first
-              served.
+              served. The MC introduces each group; photos stay on Contestants.
             </li>
             <li className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100">
-              Optional photo and fun facts help the MC introduce your dog.
+              After the last group, vote once in each of the five prizes. Optional
+              photo and fun facts help the MC introduce your dog.
             </li>
           </ul>
         </aside>

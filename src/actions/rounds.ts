@@ -122,14 +122,13 @@ export async function startAudienceVoting(): Promise<ActionResult> {
     }
   }
 
-  const { count: finalistCount } = await supabase
+  const { count: dogCount } = await supabase
     .from("dogs")
-    .select("*", { count: "exact", head: true })
-    .eq("is_finalist", true);
-  if (!finalistCount) {
+    .select("*", { count: "exact", head: true });
+  if (!dogCount) {
     return {
       ok: false,
-      error: "Pick finalists first (Admin → Finalists), then start prize voting.",
+      error: "No contestants yet. Open voting after dogs have signed up.",
     };
   }
 
@@ -150,7 +149,6 @@ export async function startAudienceVoting(): Promise<ActionResult> {
 
   revalidatePath("/vote");
   revalidatePath("/admin");
-  revalidatePath("/admin/finalists");
   return { ok: true };
 }
 
