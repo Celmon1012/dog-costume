@@ -35,8 +35,8 @@ export default function RegisterPage() {
               served. The MC introduces each group; photos stay on Contestants.
             </li>
             <li className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100">
-              After the last group, vote once in each of the five prizes. Optional
-              photo and fun facts help the MC introduce your dog.
+              After the last group, vote once for each of the five prizes. A
+              recommended photo and fun facts help the MC introduce your dog.
             </li>
           </ul>
         </aside>

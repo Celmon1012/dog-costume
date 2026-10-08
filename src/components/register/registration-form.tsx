@@ -209,7 +209,7 @@ export function RegistrationForm() {
               )}
             />
             <div className="space-y-2">
-              <FormLabel>Dog photo (optional)</FormLabel>
+              <FormLabel>Dog photo (recommended)</FormLabel>
               <p className="text-sm text-slate-500">
                 This will help showcase your dog for voting and remind everyone
                 of their awesome costume.

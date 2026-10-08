@@ -145,7 +145,7 @@ export function VoteForm({
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
       <p className="text-center text-slate-600">
-        One vote per prize. Pick one dog in each of the five categories, then
+        One vote per prize. Pick one dog for each of the five prizes, then
         submit once.
       </p>
       {sortedCategories.map((category) => {

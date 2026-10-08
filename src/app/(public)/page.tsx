@@ -26,7 +26,7 @@ const steps = [
     icon: ClipboardList,
     title: "1. Sign up your dog",
     blurb:
-      "Walk-ins are welcome. Fill in your dog’s name, costume, and an optional photo. You will get a number like DOG-001, and your dog is placed in a small group of ten.",
+      "Walk-ins are welcome. Fill in your dog’s name, costume, and a recommended photo. You will get a number like DOG-001, and your dog is placed in a small group of ten.",
   },
   {
     icon: Users,
@@ -38,7 +38,7 @@ const steps = [
     icon: Vote,
     title: "3. Vote after the last group",
     blurb:
-      "When every group has been on stage, voting opens. Pick one dog in each of the five prize categories. One vote per prize, per phone. Winners are announced at the end.",
+      "When every group has been on stage, voting opens. Pick one dog for each of the five prizes. One vote per prize, per phone. Winners are announced at the end.",
   },
 ];
 
@@ -68,7 +68,7 @@ export default function HomePage() {
             Sign up your dog, then enjoy the introductions. Dogs come out in
             small groups of ten while the MC tells each story. Photos stay on
             this site so you can look back. After the last group, voting opens
-            for five prizes — one winner in each category.
+            for five prizes — one winner for each prize.
           </p>
           <div className="mt-8 flex w-full max-w-lg flex-col gap-3 sm:flex-row">
             <Button asChild className="h-12 flex-1 rounded-full text-base">
@@ -95,7 +95,7 @@ export default function HomePage() {
             montclair-dog.com. Use your phone here to sign up, look at the dogs,
             and vote when the emcee says voting is open. You do not vote after
             every group — wait until all the dogs have been introduced, then
-            choose one winner in each prize.
+            choose one winner for each prize.
           </p>
         </section>
 
@@ -131,9 +131,9 @@ export default function HomePage() {
                 <p className="text-sm font-medium text-orange-200">Walk-ins welcome</p>
                 <h3 className="text-2xl font-bold">Sign up your dog</h3>
                 <p className="mt-1 max-w-xl text-sm text-white/85">
-                  Name, costume, optional photo — get your contestant number
+                  Name, costume, recommended photo — get your contestant number
                   instantly. After the last group is introduced, use Vote to
-                  pick one dog in each prize.
+                  pick one dog for each prize.
                 </p>
               </div>
             </div>
@@ -144,8 +144,8 @@ export default function HomePage() {
           <div className="mb-6 text-center">
             <h2 className="text-3xl font-bold text-slate-900">Prize categories</h2>
             <p className="mt-2 text-slate-600">
-              One vote per prize. You can vote in all five. One winner is chosen
-              in each category at the end.
+              One vote per prize. You can vote in all five. One winner for each
+              prize.
             </p>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
