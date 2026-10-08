@@ -1,6 +1,6 @@
 import { DogCard } from "@/components/dogs/dog-card";
+import { PageBanner } from "@/components/layout/page-banner";
 import { createClient } from "@/lib/supabase/server";
-import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -51,26 +51,13 @@ export default async function ContestPage() {
 
   return (
     <div className="bg-[#f6f1ea] pb-12">
-      <div className="relative h-48 w-full overflow-hidden sm:h-64">
-        <Image
-          src="/images/contest-dogs.webp"
-          alt="Costume contest dogs"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-0 flex items-end px-4 py-6 sm:px-6">
-          <div className="mx-auto w-full max-w-6xl text-white">
-            <h1 className="text-3xl font-bold">Contestants</h1>
-            <p className="mt-1 max-w-2xl text-sm text-white/90">
-              {liveRound
-                ? `Round ${liveRound.roundNumber} is on stage now. Photos stay here so you can look back — voting opens after the last group.`
-                : "Browse photos from each group. There is no voting on this page. Prize voting opens on Vote after every group has been introduced."}
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageBanner title="Contestants">
+        <p className="mt-1 max-w-2xl text-sm text-slate-600">
+          {liveRound
+            ? `Round ${liveRound.roundNumber} is on stage now. Photos stay here so you can look back — voting opens after the last group.`
+            : "Browse photos from each group. There is no voting on this page. Prize voting opens on Vote after every group has been introduced."}
+        </p>
+      </PageBanner>
       <div className="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
         {!visibleSections.length ? (
           <p className="rounded-lg border border-dashed border-orange-200 bg-white/70 p-8 text-center text-slate-600">

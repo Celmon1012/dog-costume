@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { PageBanner } from "@/components/layout/page-banner";
 import { VoteForm } from "@/components/vote/vote-form";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,24 +29,11 @@ export default async function VotePage() {
 
   return (
     <div className="bg-[#f6f1ea] pb-12">
-      <div className="relative h-48 w-full overflow-hidden sm:h-64">
-        <Image
-          src="/images/vote-dog.webp"
-          alt="Vote for costume prizes"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-0 flex items-end px-4 py-6 sm:px-6">
-          <div className="mx-auto w-full max-w-6xl text-white">
-            <h1 className="text-3xl font-bold">Vote</h1>
-            <p className="mt-1 text-sm text-white/90">
-              One round of voting: pick one dog in each of the five prizes.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageBanner title="Vote">
+        <p className="mt-1 text-sm text-slate-600">
+          One round of voting: pick one dog in each of the five prizes.
+        </p>
+      </PageBanner>
       <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
         <VoteForm
           categories={(categories ?? []).map((category) => ({

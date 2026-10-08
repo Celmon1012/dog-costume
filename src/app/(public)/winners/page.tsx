@@ -1,6 +1,7 @@
 import { Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DogPhoto } from "@/components/dogs/dog-photo";
+import { PageBanner } from "@/components/layout/page-banner";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -41,29 +42,29 @@ export default async function WinnersPage() {
 
   if (!announced) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-        <Trophy className="mx-auto h-12 w-12 text-orange-400" />
-        <h1 className="mt-4 text-3xl font-bold text-slate-900">Winners</h1>
-        <p className="mt-2 text-slate-600">
-          The congratulations page opens after the emcee chooses a winner in
-          every prize category.
-        </p>
+      <div className="bg-[#f6f1ea] pb-16">
+        <PageBanner title="Winners">
+          <p className="mt-1 text-sm text-slate-600">
+            The congratulations page opens after the emcee chooses a winner in
+            every prize category.
+          </p>
+        </PageBanner>
+        <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
+          <Trophy className="mx-auto h-12 w-12 text-orange-400" />
+          <p className="mt-4 text-slate-600">Winners are not announced yet.</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="bg-[#f6f1ea] pb-20">
-      <div className="bg-gradient-to-br from-orange-500 to-violet-700 px-4 py-14 text-center text-white sm:px-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-100">
-          Dog Costume Contest
-        </p>
-        <h1 className="mt-3 text-4xl font-bold sm:text-6xl">Congratulations!</h1>
-        <p className="mx-auto mt-3 max-w-2xl text-base text-white/90 sm:text-lg">
+      <PageBanner title="Congratulations!">
+        <p className="mt-1 max-w-2xl text-sm text-slate-600 sm:text-base">
           Here are this year’s prize winners — voted by the crowd, chosen by the
           emcee.
         </p>
-      </div>
+      </PageBanner>
       <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-2">
         {(categories ?? []).map((category) => {
           const dog = dogById.get(category.winner_dog_id as string);
